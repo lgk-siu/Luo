@@ -1,0 +1,3319 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>罗光锟 — 永远爱抬杠的 ENTP</title>
+    <meta name="description" content="罗光锟 — ENTP · 足球斗士 · 滑板漫游者 · 泳池破浪者" />
+
+    <style>
+        /* ================================================================
+           罗光锟 — 像素竞技风个人主页
+           参考 小周大师 设计语言 · 3 主题 · 粒子画布 · Glitch · 3D 卡片
+           ================================================================ */
+
+        /* -------------------- CSS 变量：3 主题 -------------------- */
+        :root {
+            --bg: #f0f4f8;
+            --bg-card: #ffffff;
+            --bg-hero: #0b1120;
+            --text: #1a1a2e;
+            --text-sub: #64748b;
+            --heading: #0f172a;
+            --primary: #e11d48;
+            --primary-d: #be123c;
+            --secondary: #f59e0b;
+            --secondary-d: #d97706;
+            --accent: #8b5cf6;
+            --border: #e2e8f0;
+            --pixel-shadow: #1a1a2e;
+            --nav-bg: rgba(240, 244, 248, 0.85);
+            --scanline-opacity: 0.03;
+            --tag-bg: #fce7f3;
+            --tag-text: #be185d;
+            --bar-bg: #e2e8f0;
+            --footer-bg: #0b1120;
+            --footer-text: #94a3b8;
+            --hero-text: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0a0a1a;
+            --bg-card: #141428;
+            --bg-hero: #040610;
+            --text: #e2e8f0;
+            --text-sub: #94a3b8;
+            --heading: #f1f5f9;
+            --primary: #fb7185;
+            --primary-d: #f43f5e;
+            --secondary: #fbbf24;
+            --secondary-d: #f59e0b;
+            --accent: #a78bfa;
+            --border: #1e1e3a;
+            --pixel-shadow: #000;
+            --nav-bg: rgba(10, 10, 26, 0.9);
+            --scanline-opacity: 0.06;
+            --tag-bg: #3b0f1f;
+            --tag-text: #fb7185;
+            --bar-bg: #1e1e3a;
+            --footer-bg: #040610;
+            --footer-text: #64748b;
+            --hero-text: #ffffff;
+        }
+
+        [data-theme="green"] {
+            --bg: #0a0f0a;
+            --bg-card: #0d1a0d;
+            --bg-hero: #050a05;
+            --text: #00ff41;
+            --text-sub: #00cc33;
+            --heading: #00ff41;
+            --primary: #00ff41;
+            --primary-d: #00cc33;
+            --secondary: #00cc33;
+            --secondary-d: #009926;
+            --accent: #00ff41;
+            --border: #0d3d0d;
+            --pixel-shadow: #002200;
+            --nav-bg: rgba(10, 15, 10, 0.95);
+            --scanline-opacity: 0.08;
+            --tag-bg: #0a2e0a;
+            --tag-text: #00ff41;
+            --bar-bg: #0d2d0d;
+            --footer-bg: #050a05;
+            --footer-text: #00cc33;
+            --hero-text: #00ff41;
+        }
+
+        /* -------------------- 基础重置 -------------------- */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px;
+            background: var(--bg);
+        }
+
+        body {
+            font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: transparent;
+            color: var(--text);
+            line-height: 1.7;
+            transition: background 0.5s ease, color 0.5s ease;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Galaxy 星空背景画布（整页 fixed 背景，transparent 叠加在 body 底色上） */
+        #galaxyCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            display: block;
+        }
+
+        /* CRT 扫描线 */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            background: repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, var(--scanline-opacity)) 2px,
+                    rgba(0, 0, 0, var(--scanline-opacity)) 4px);
+            transition: background 0.5s ease;
+        }
+
+        /* -------------------- 导航栏 -------------------- */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: var(--nav-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 2px solid var(--border);
+            transition: all 0.5s;
+        }
+
+        .nav-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.8rem;
+            color: var(--primary);
+            text-decoration: none;
+            letter-spacing: 2px;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-logo:hover {
+            color: var(--secondary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+            align-items: center;
+        }
+        .nav-links a {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.5rem;
+            color: var(--text-sub);
+            text-decoration: none;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary);
+            transition: width 0.3s;
+        }
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--primary);
+        }
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        .theme-group {
+            display: flex;
+            gap: 2px;
+        }
+        .theme-btn {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            color: var(--text);
+            font-size: 0.75rem;
+            cursor: pointer;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            image-rendering: pixelated;
+        }
+        .theme-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 2px 2px 0 var(--primary);
+        }
+        .theme-btn.active {
+            border-color: var(--secondary);
+            color: var(--secondary);
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 8px;
+            background: none;
+            border: none;
+        }
+        .hamburger span {
+            display: block;
+            width: 26px;
+            height: 3px;
+            background: var(--text);
+            transition: all 0.3s;
+        }
+
+        .nav-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: repeating-linear-gradient(90deg,
+                    var(--primary) 0px,
+                    var(--primary) 6px,
+                    var(--secondary) 6px,
+                    var(--secondary) 12px);
+            width: 0%;
+            transition: width 0.1s linear;
+            image-rendering: pixelated;
+        }
+
+        /* -------------------- Hero -------------------- */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: transparent;
+            overflow: hidden;
+            transition: background 0.5s;
+        }
+        .hero::before {
+            display: none;
+        }
+        [data-theme="green"] .hero::before {
+            display: none;
+        }
+        @keyframes gridScroll {
+            to {
+                transform: translate(40px, 40px);
+            }
+        }
+
+        .hero-canvas {
+            display: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 2rem;
+            max-width: 800px;
+        }
+
+        .hero-pixel-frame {
+            display: inline-block;
+            padding: 0;
+            position: relative;
+            border: none;
+            box-shadow: none;
+            image-rendering: pixelated;
+            transition: all 0.5s;
+        }
+        @media (max-width: 600px) {
+            .hero-pixel-frame {
+                padding: 0;
+            }
+        }
+
+        .hero-name {
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(1.2rem, 5vw, 2.2rem);
+            color: var(--hero-text);
+            margin-bottom: 1rem;
+            text-shadow: 3px 3px 0 var(--primary);
+            line-height: 1.6;
+            position: relative;
+            animation: glitch 5s ease-in-out infinite;
+        }
+        .hero-name::before,
+        .hero-name::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            font-family: 'Press Start 2P', monospace;
+            font-size: inherit;
+        }
+        .hero-name::before {
+            color: #ff0000;
+            z-index: -1;
+            animation: glitchRed 5s ease-in-out infinite;
+        }
+        .hero-name::after {
+            color: #0000ff;
+            z-index: -2;
+            animation: glitchBlue 5s ease-in-out infinite;
+        }
+        @keyframes glitch {
+            0%,
+            90%,
+            100% {
+                transform: translate(0);
+            }
+            92% {
+                transform: translate(-2px, 1px);
+            }
+            94% {
+                transform: translate(2px, -1px);
+            }
+            96% {
+                transform: translate(-1px, 2px);
+            }
+            98% {
+                transform: translate(1px, 0);
+            }
+        }
+        @keyframes glitchRed {
+            0%,
+            90%,
+            100% {
+                opacity: 0;
+                transform: translate(0);
+            }
+            92.5% {
+                opacity: 0.6;
+                transform: translate(-3px, 0);
+            }
+            95% {
+                opacity: 0;
+                transform: translate(0);
+            }
+        }
+        @keyframes glitchBlue {
+            0%,
+            90%,
+            100% {
+                opacity: 0;
+                transform: translate(0);
+            }
+            94% {
+                opacity: 0.6;
+                transform: translate(3px, 0);
+            }
+            96.5% {
+                opacity: 0;
+                transform: translate(0);
+            }
+        }
+
+        .hero-sub {
+            font-size: clamp(1rem, 3vw, 1.35rem);
+            color: var(--secondary);
+            font-weight: 400;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .hero-sub .cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1.3em;
+            background: var(--secondary);
+            vertical-align: text-bottom;
+            animation: blink 0.7s step-end infinite;
+        }
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .hero-en {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.5rem;
+            color: var(--text-sub);
+            margin-top: 1.5rem;
+            letter-spacing: 3px;
+        }
+        .hero-en .en-accent {
+            color: var(--accent);
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.65rem;
+            animation: floatHint 2s ease-in-out infinite;
+            cursor: pointer;
+            font-family: 'Press Start 2P', monospace;
+        }
+        .scroll-hint .arrow {
+            font-size: 1.2rem;
+        }
+        @keyframes floatHint {
+            0%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translateX(-50%) translateY(10px);
+                opacity: 1;
+            }
+        }
+
+        /* -------------------- 通用区块 -------------------- */
+        .section {
+            padding: 6rem 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .section-title {
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(0.7rem, 2.5vw, 0.95rem);
+            text-align: center;
+            color: var(--heading);
+            margin-bottom: 0.75rem;
+            letter-spacing: 3px;
+            transition: color 0.5s;
+        }
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-sub);
+            margin-bottom: 3.5rem;
+            font-size: 0.95rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .section-subtitle::before,
+        .section-subtitle::after {
+            content: ' // ';
+            color: var(--secondary);
+        }
+
+        .pixel-divider {
+            width: 80px;
+            height: 8px;
+            margin: 0 auto 1.5rem;
+            background: repeating-linear-gradient(90deg,
+                    var(--primary) 0px,
+                    var(--primary) 12px,
+                    var(--secondary) 12px,
+                    var(--secondary) 24px);
+            image-rendering: pixelated;
+        }
+
+        .fade-section {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .fade-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* -------------------- 3D 卡片倾斜 -------------------- */
+        .tilt-card {
+            perspective: 800px;
+        }
+        .tilt-card-inner {
+            transition: transform 0.1s ease-out;
+            transform-style: preserve-3d;
+        }
+
+        /* -------------------- 关于我 -------------------- */
+        .about-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            padding: 2.5rem 2rem;
+            box-shadow: 6px 6px 0 var(--pixel-shadow);
+            transition: all 0.5s;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .about-card:hover {
+            box-shadow: 8px 8px 0 var(--primary);
+            transform: translate(-2px, -2px);
+        }
+        .about-card p {
+            font-size: 1.05rem;
+            line-height: 2;
+            margin-bottom: 1rem;
+        }
+        .about-card .highlight {
+            color: var(--primary);
+            font-weight: 700;
+        }
+        .about-card .highlight-green {
+            color: var(--secondary);
+            font-weight: 700;
+        }
+        .about-card .highlight-amber {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .about-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-top: 1.5rem;
+        }
+        .about-tag {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.45rem;
+            padding: 0.4rem 0.8rem;
+            background: var(--tag-bg);
+            color: var(--tag-text);
+            border: 1px solid var(--border);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+        .about-tag:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 3px 3px 0 var(--primary);
+        }
+
+        .mbti-badge {
+            display: inline-block;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--primary);
+            box-shadow: 3px 3px 0 var(--accent);
+        }
+
+        /* 教育卡片 */
+        .edu-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            padding: 2rem 2rem;
+            box-shadow: 6px 6px 0 var(--pixel-shadow);
+            transition: all 0.5s;
+            max-width: 700px;
+            margin: 2rem auto 0;
+        }
+        .edu-card:hover {
+            box-shadow: 8px 8px 0 var(--secondary);
+            transform: translate(-2px, -2px);
+        }
+        .edu-card .edu-title {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.8rem;
+            color: var(--heading);
+            margin-bottom: 0.5rem;
+        }
+        .edu-card .edu-detail {
+            color: var(--text-sub);
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+        .edu-card .edu-detail strong {
+            color: var(--text);
+        }
+
+        /* -------------------- 热爱（完整保留） -------------------- */
+        .hobby-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .hobby-item {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            padding: 1.5rem;
+            transition: all 0.5s;
+            box-shadow: 4px 4px 0 var(--pixel-shadow);
+        }
+        .hobby-item:hover {
+            box-shadow: 6px 6px 0 var(--secondary);
+            transform: translate(-2px, -2px);
+        }
+        .hobby-icon {
+            font-size: 2.2rem;
+            margin-bottom: 0.75rem;
+        }
+        .hobby-name {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.55rem;
+            color: var(--heading);
+            margin-bottom: 0.75rem;
+            letter-spacing: 1px;
+            transition: color 0.5s;
+        }
+        .hobby-bar-wrap {
+            background: var(--bar-bg);
+            height: 14px;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+            transition: background 0.5s;
+        }
+        .hobby-bar-fill {
+            height: 100%;
+            background: repeating-linear-gradient(90deg,
+                    var(--primary) 0px,
+                    var(--primary) 8px,
+                    var(--primary-d) 8px,
+                    var(--primary-d) 16px);
+            width: 0;
+            transition: width 1.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+            image-rendering: pixelated;
+        }
+        .hobby-bar-fill.green {
+            background: repeating-linear-gradient(90deg,
+                    var(--secondary) 0px,
+                    var(--secondary) 8px,
+                    var(--secondary-d) 8px,
+                    var(--secondary-d) 16px);
+        }
+        .hobby-bar-fill.amber {
+            background: repeating-linear-gradient(90deg,
+                    var(--accent) 0px,
+                    var(--accent) 8px,
+                    #7c3aed 8px,
+                    #7c3aed 16px);
+        }
+        .hobby-level {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.5rem;
+            color: var(--text-sub);
+            text-align: right;
+            margin-top: 0.35rem;
+        }
+
+        /* -------------------- 技能卡片（新） -------------------- */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto 2rem;
+        }
+
+        .skill-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            padding: 2rem 1.8rem;
+            box-shadow: 6px 6px 0 var(--pixel-shadow);
+            transition: all 0.5s;
+        }
+        .skill-card:hover {
+            box-shadow: 8px 8px 0 var(--secondary);
+            transform: translate(-2px, -2px);
+        }
+
+        .skill-card .skill-card-title {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.65rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.6rem;
+        }
+
+        .skill-card .skill-item {
+            margin-bottom: 1rem;
+        }
+
+        .skill-card .skill-item .skill-item-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--heading);
+            display: block;
+            margin-bottom: 0.15rem;
+        }
+
+        .skill-card .skill-item .skill-item-desc {
+            font-size: 0.88rem;
+            color: var(--text-sub);
+            line-height: 1.7;
+        }
+
+        .skill-card .skill-item .skill-item-desc strong {
+            color: var(--text);
+        }
+
+        .skill-card .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+            border-top: 1px solid var(--border);
+            padding-top: 0.8rem;
+        }
+
+        .skill-card .skill-tags span {
+            font-size: 0.45rem;
+            padding: 0.25rem 0.7rem;
+            font-family: 'Press Start 2P', monospace;
+            background: var(--tag-bg);
+            color: var(--tag-text);
+            border: 1px solid var(--border);
+            letter-spacing: 0.5px;
+        }
+
+        .skill-card .skill-tags span.accent-tag {
+            background: rgba(225, 29, 72, 0.1);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* 标签云 */
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            justify-content: center;
+            max-width: 700px;
+            margin: 2rem auto 0;
+        }
+        .tag-cloud span {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--border);
+            color: var(--text-sub);
+            transition: all 0.3s;
+            cursor: default;
+        }
+        .tag-cloud span:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+            transform: scale(1.1);
+            box-shadow: 4px 4px 0 var(--primary);
+        }
+        .tag-cloud span:nth-child(odd):hover {
+            color: var(--secondary);
+            border-color: var(--secondary);
+            box-shadow: 4px 4px 0 var(--secondary);
+        }
+
+        /* 作品卡片 */
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .project-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            padding: 2rem;
+            box-shadow: 6px 6px 0 var(--pixel-shadow);
+            text-align: center;
+            transition: all 0.5s;
+        }
+        .project-card:hover {
+            box-shadow: 8px 8px 0 var(--accent);
+            transform: translate(-2px, -2px);
+        }
+        .project-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .project-name {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.6rem;
+            color: var(--heading);
+            margin-bottom: 0.75rem;
+            transition: color 0.5s;
+        }
+        .project-desc {
+            color: var(--text-sub);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        .project-tags span {
+            font-size: 0.45rem;
+            padding: 0.25rem 0.6rem;
+            font-family: 'Press Start 2P', monospace;
+            background: var(--tag-bg);
+            color: var(--tag-text);
+            border: 1px solid var(--border);
+        }
+
+        /* -------------------- 联系方式 -------------------- */
+        .contact-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            padding: 2.5rem 2rem;
+            box-shadow: 6px 6px 0 var(--pixel-shadow);
+            text-align: center;
+            max-width: 550px;
+            margin: 0 auto;
+            transition: all 0.5s;
+        }
+        .contact-card:hover {
+            box-shadow: 8px 8px 0 var(--primary);
+            transform: translate(-2px, -2px);
+        }
+        .contact-price {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1.1rem;
+            color: var(--accent);
+            margin: 1.5rem 0;
+            animation: pricePulse 2s ease-in-out infinite;
+        }
+        @keyframes pricePulse {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.05);
+            }
+        }
+        .contact-links {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+        .contact-links a,
+        .contact-links .contact-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 52px;
+            height: 52px;
+            border: 2px solid var(--border);
+            color: var(--text-sub);
+            font-size: 1.3rem;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: none;
+            font-family: inherit;
+            image-rendering: pixelated;
+        }
+        .contact-links a:hover,
+        .contact-links .contact-btn:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 4px 4px 0 var(--primary);
+            transform: translate(-2px, -2px);
+        }
+
+        /* -------------------- 页脚 -------------------- */
+        .footer {
+            background: var(--footer-bg);
+            color: var(--footer-text);
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            transition: background 0.5s, color 0.5s;
+        }
+        .footer .pixel-heart {
+            display: inline-block;
+            color: #ef4444;
+            animation: heartBeat 1.5s ease-in-out infinite;
+        }
+        @keyframes heartBeat {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            15% {
+                transform: scale(1.3);
+            }
+            30% {
+                transform: scale(1);
+            }
+        }
+        .footer-ascii {
+            font-size: 0.5rem;
+            margin-top: 0.75rem;
+            opacity: 0.3;
+        }
+
+        /* -------------------- 回到顶部 -------------------- */
+        #back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 48px;
+            height: 48px;
+            z-index: 998;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            color: var(--text);
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            transition: all 0.3s;
+            image-rendering: pixelated;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #back-to-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        #back-to-top:hover {
+            border-color: var(--primary);
+            box-shadow: 4px 4px 0 var(--primary);
+            transform: translate(-2px, -2px);
+        }
+
+        /* -------------------- 响应式 -------------------- */
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 280px;
+                height: 100vh;
+                background: var(--bg-card);
+                flex-direction: column;
+                padding: 5rem 2rem 2rem;
+                gap: 1.8rem;
+                transition: right 0.4s ease;
+                border-left: 2px solid var(--border);
+                z-index: 1001;
+            }
+            .nav-links.open {
+                right: 0;
+            }
+            .nav-links a {
+                font-size: 0.65rem;
+            }
+            .hamburger {
+                display: flex;
+                z-index: 1002;
+            }
+            .hamburger.open span:nth-child(1) {
+                transform: rotate(45deg) translate(5px, 6px);
+            }
+            .hamburger.open span:nth-child(2) {
+                opacity: 0;
+            }
+            .hamburger.open span:nth-child(3) {
+                transform: rotate(-45deg) translate(5px, -6px);
+            }
+            .section {
+                padding: 4rem 1rem;
+            }
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+            .hobby-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .project-grid {
+                grid-template-columns: 1fr;
+            }
+            .theme-group {
+                gap: 1px;
+            }
+            .theme-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 0.65rem;
+            }
+            .nav-logo {
+                font-size: 0.65rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-pixel-frame {
+                padding: 1.5rem 1rem;
+            }
+            .hero-name {
+                font-size: 0.85rem;
+            }
+            .hero-en {
+                font-size: 0.4rem;
+            }
+            .about-card {
+                padding: 1.5rem 1rem;
+            }
+            .about-card p {
+                font-size: 0.9rem;
+                line-height: 1.9;
+            }
+            .tag-cloud span {
+                font-size: 0.4rem;
+                padding: 0.35rem 0.65rem;
+            }
+            .contact-links {
+                gap: 0.8rem;
+            }
+            .contact-links a,
+            .contact-links .contact-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 1.1rem;
+            }
+            .skill-card {
+                padding: 1.5rem 1rem;
+            }
+            .hobby-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ================================================================
+           ProfileCard · 3D Tilt 个人卡片（pointer-follow 高光/眩光）
+           ================================================================ */
+        .profile-card-stage {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 1.5rem auto 2rem;
+            perspective: 1200px;
+        }
+        .pc-card-wrapper {
+            --pointer-x: 50%;
+            --pointer-y: 50%;
+            --background-x: 50%;
+            --background-y: 50%;
+            --pointer-from-center: 0;
+            --pointer-from-top: 0.5;
+            --pointer-from-left: 0.5;
+            --rotate-x: 0deg;
+            --rotate-y: 0deg;
+            --inner-gradient: linear-gradient(145deg, rgba(96,73,110,0.55) 0%, rgba(113,196,255,0.27) 100%);
+            --behind-glow-color: rgba(125,190,255,0.67);
+            --behind-glow-size: 50%;
+
+            position: relative;
+            width: min(380px, 88vw);
+            aspect-ratio: 5 / 7;
+            border-radius: 24px;
+            perspective: 1000px;
+        }
+        .pc-card-wrapper * { pointer-events: none; }
+
+        .pc-behind {
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+            background: radial-gradient(circle at var(--background-x) var(--background-y),
+                var(--behind-glow-color) 0%, transparent 70%);
+            filter: blur(34px);
+            transform: scale(1.08);
+            opacity: 0.85;
+            z-index: 0;
+            transition: transform 0.45s ease, opacity 0.45s ease;
+        }
+        .pc-card-shell {
+            position: absolute;
+            inset: 0;
+            transform-style: preserve-3d;
+            transform: rotateX(var(--rotate-x)) rotateY(var(--rotate-y));
+            transition: transform 0.25s ease-out;
+            z-index: 1;
+            will-change: transform;
+        }
+        .pc-card-shell.active { transition: none; }
+
+        .pc-card {
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+            overflow: hidden;
+            background: #0b0b14;
+            border: 1px solid rgba(255,255,255,0.18);
+            box-shadow:
+                0 25px 50px -12px rgba(0,0,0,0.55),
+                0 8px 16px -8px rgba(0,0,0,0.45),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .pc-inside {
+            position: absolute;
+            inset: 1px;
+            border-radius: 23px;
+            overflow: hidden;
+            background: var(--inner-gradient);
+        }
+        .pc-shine {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(115deg,
+                transparent 30%,
+                rgba(255,255,255,0.10) 45%,
+                rgba(255,255,255,0.32) 50%,
+                rgba(255,255,255,0.10) 55%,
+                transparent 70%);
+            background-size: 200% 200%;
+            background-position: var(--background-x) var(--background-y);
+            mix-blend-mode: overlay;
+            opacity: calc(var(--pointer-from-center) * 0.85);
+            pointer-events: none;
+        }
+        .pc-glare {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at var(--pointer-x) var(--pointer-y),
+                rgba(255,255,255,0.28) 0%, transparent 40%);
+            mix-blend-mode: overlay;
+            opacity: var(--pointer-from-center);
+            pointer-events: none;
+        }
+        .pc-content {
+            position: absolute;
+            inset: 0;
+            padding: 1.1rem;
+            display: flex;
+        }
+        .pc-avatar-content {
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: stretch;
+            z-index: 2;
+        }
+        .avatar {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center top;
+            z-index: 0;
+        }
+        .pc-user-info {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 0.55rem 0.7rem;
+            border-radius: 16px;
+            background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .pc-user-details {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            min-width: 0;
+        }
+        .pc-mini-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.75);
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.25), 0 4px 8px rgba(0,0,0,0.35);
+            flex-shrink: 0;
+            background: #0b0b14;
+        }
+        .pc-mini-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .pc-user-text { min-width: 0; line-height: 1.2; }
+        .pc-handle {
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.92rem;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.75);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .pc-status {
+            color: rgba(255,255,255,0.88);
+            font-size: 0.72rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .pc-status::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ade80;
+            box-shadow: 0 0 6px #4ade80;
+            flex-shrink: 0;
+        }
+        .pc-contact-btn {
+            flex-shrink: 0;
+            pointer-events: auto !important;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.4);
+            background: linear-gradient(180deg, rgba(255,255,255,0.20), rgba(255,255,255,0.06));
+            color: #fff;
+            padding: 0.4rem 0.85rem;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+        }
+        .pc-contact-btn:hover {
+            transform: translateY(-1px);
+            background: linear-gradient(180deg, rgba(255,255,255,0.30), rgba(255,255,255,0.12));
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        .pc-details {
+            position: relative;
+            z-index: 2;
+            align-self: flex-end;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+        }
+        .pc-details h3 {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1.35rem;
+            margin: 0 0 0.3rem;
+            letter-spacing: 0.02em;
+            background: linear-gradient(180deg, #fff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+        .pc-details p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.9);
+            letter-spacing: 0.02em;
+        }
+        @media (max-width: 600px) {
+            .pc-card-wrapper { width: min(320px, 88vw); }
+            .pc-details h3 { font-size: 1.15rem; }
+            .pc-handle { font-size: 0.85rem; }
+            .pc-mini-avatar { width: 32px; height: 32px; }
+        }
+        [data-theme="dark"] .pc-card-wrapper { --behind-glow-color: rgba(167,139,250,0.62); }
+        [data-theme="green"] .pc-card-wrapper {
+            --behind-glow-color: rgba(0,255,65,0.55);
+            --inner-gradient: linear-gradient(145deg, rgba(0,40,15,0.55) 0%, rgba(0,80,40,0.27) 100%);
+        }
+        [data-theme="dark"] .pc-card,
+        [data-theme="green"] .pc-card {
+            border-color: rgba(255,255,255,0.1);
+        }
+        [data-theme="green"] .pc-status::before {
+            background: var(--primary);
+            box-shadow: 0 0 6px var(--primary);
+        }
+
+        /* ================================================================
+           AccordionGallery · 手风琴式荣誉画廊（纯 CSS transition 复刻 React+GSAP 版）
+           ================================================================ */
+        .accordion-gallery {
+            --ag-accent: #ffffff;
+            --ag-overlay: #060010;
+            --ag-text: #ffffff;
+            --ag-gap: 10px;
+            --ag-radius: 16px;
+            --ag-grow: 6.5;            /* 展开面板 flex-grow，对应 expandRatio≈0.52 */
+            --ag-tilt: 8deg;           /* 未激活面板的 Y 轴倾斜 */
+            --ag-media-size: 320px;
+
+            position: relative;
+            display: flex;
+            gap: var(--ag-gap);
+            width: 100%;
+            max-width: 1000px;
+            margin: 2rem auto 0;
+            height: 460px;
+            padding: 4px;
+            perspective: 1200px;
+            list-style: none;
+        }
+        @media (max-width: 600px) {
+            .accordion-gallery { height: 360px; --ag-grow: 4; }
+        }
+
+        .ag-panel {
+            position: relative;
+            flex: 1 1 0;
+            min-width: 0;
+            border-radius: var(--ag-radius);
+            overflow: hidden;
+            cursor: pointer;
+            transform-origin: center center;
+            transform: rotateY(var(--ag-tilt));
+            transform-style: preserve-3d;
+            transition:
+                flex-grow 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: flex-grow, transform;
+            text-decoration: none;
+            color: inherit;
+            outline: none;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            box-shadow: 0 12px 32px -8px rgba(0,0,0,0.45);
+        }
+        .ag-panel:focus-visible {
+            box-shadow: 0 0 0 3px var(--primary), 0 12px 32px -8px rgba(0,0,0,0.45);
+        }
+        .ag-panel.ag-panel--active {
+            flex-grow: var(--ag-grow);
+            transform: rotateY(0deg);
+        }
+        /* 未激活时反向倾斜（左侧正向、右侧反向）由 JS 加 .ag-panel--left/right */
+        .ag-panel.ag-panel--left { transform: rotateY(var(--ag-tilt)); }
+        .ag-panel.ag-panel--right { transform: rotateY(calc(var(--ag-tilt) * -1)); }
+        .ag-panel.ag-panel--active.ag-panel--left,
+        .ag-panel.ag-panel--active.ag-panel--right { transform: rotateY(0deg); }
+
+        .ag-panel__frame {
+            position: absolute;
+            inset: 0;
+            display: block;
+            overflow: hidden;
+            border-radius: inherit;
+        }
+        .ag-panel__media {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: var(--ag-media-size);
+            height: 100%;
+            transform: translate(-50%, -50%);
+            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+        }
+        .ag-panel__media img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            user-select: none;
+            -webkit-user-drag: none;
+            filter: grayscale(1) brightness(0.65);
+            transition: filter 0.6s ease;
+        }
+        .ag-panel--active .ag-panel__media img {
+            filter: grayscale(0) brightness(1);
+        }
+
+        .ag-panel__overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg,
+                rgba(6, 0, 16, 0.10) 0%,
+                rgba(6, 0, 16, 0.45) 60%,
+                rgba(6, 0, 16, 0.85) 100%);
+            pointer-events: none;
+        }
+
+        .ag-panel__label {
+            position: absolute;
+            left: 18px;
+            bottom: 20px;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            pointer-events: none;
+        }
+        .ag-panel__bar {
+            display: block;
+            width: 28px;
+            height: 2px;
+            background: var(--ag-accent);
+            opacity: 0;
+            transform: translateX(-14px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .ag-panel__text {
+            color: var(--ag-text);
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.78rem;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.85);
+            opacity: 0;
+            transform: translateX(-14px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        /* stagger：text 延迟 60ms */
+        .ag-panel--active .ag-panel__bar,
+        .ag-panel--active .ag-panel__text {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .ag-panel--active .ag-panel__text { transition-delay: 0.06s; }
+
+        /* 适配三主题 */
+        [data-theme="green"] .accordion-gallery {
+            --ag-overlay: #050a05;
+            --ag-accent: var(--primary);
+        }
+        [data-theme="dark"] .accordion-gallery {
+            --ag-overlay: #040610;
+        }
+
+        /* ================================================================
+           StrokeText · SVG 描边动画 + wipe 填充（纯 CSS + JS RAF 复刻 React+GSAP 版）
+           ================================================================ */
+        .stroke-text {
+            display: inline-block;
+            line-height: 1;
+            position: relative;
+            vertical-align: middle;
+        }
+        .stroke-text__svg {
+            display: block;
+            height: var(--stroke-text-height, 125px);
+            width: auto;
+            max-width: 92vw;
+            overflow: visible;
+        }
+        .stroke-text__stroke [data-stroke-char] {
+            stroke-dasharray: var(--dash, 900);
+            stroke-dashoffset: var(--dash, 900);
+            animation: strokeTextDraw 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            animation-delay: calc(var(--i, 0) * 0.05s);
+        }
+        @keyframes strokeTextDraw {
+            to { stroke-dashoffset: 0; }
+        }
+        .stroke-text__fill {
+            opacity: 1; /* 由 clip-path 控制显隐，opacity 保持 1 */
+        }
+        .stroke-text__fill [data-fill-char] { opacity: 1; }
+
+        /* reduced-motion：直接到结束态 */
+        @media (prefers-reduced-motion: reduce) {
+            .stroke-text__stroke [data-stroke-char] {
+                animation: none;
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* 适配三主题：描边色随主题变 */
+        [data-theme="dark"] .stroke-text__stroke { stroke: #A78BFA; }
+        [data-theme="green"] .stroke-text__stroke { stroke: #00ff41; }
+        [data-theme="green"] .stroke-text__fill { fill: #d3ffe0; }
+
+        /* ================================================================
+           Shuffle · 字符滚动入场（复刻 React + GSAP SplitText 版）
+           - 每字符包 wrapper(overflow hidden) + inner span
+           - 初始 translateY(115%)（藏在 wrapper 下方）
+           - 进入视图触发 .is-shuffled → translateY(0)
+           - stagger 通过 --i 计算 transition-delay
+           ================================================================ */
+        .skill-card-title,
+        .skill-item-title,
+        .skill-item-desc {
+            line-height: 1.7;
+        }
+        .shuf-wrap {
+            display: inline-block;
+            overflow: hidden;
+            vertical-align: bottom;
+            line-height: 1.55;
+        }
+        .shuf-char {
+            display: inline-block;
+            transform: translateY(115%);
+            transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+            transition-delay: calc(var(--i, 0) * 0.022s);
+            will-change: transform;
+        }
+        .is-shuffled .shuf-char {
+            transform: translateY(0);
+        }
+        /* reduced-motion：直接显示 */
+        @media (prefers-reduced-motion: reduce) {
+            .shuf-char { transform: none; transition: none; }
+        }
+
+        /* ================================================================
+           PixelTrail · 鼠标轨迹像素网格点阵（复刻 React Three Fiber 版）
+           - 全屏 canvas，pointer-events: none 不阻挡交互
+           - 网格点（每 40px 一个）默认隐藏，鼠标轨迹经过时点亮
+           - SVG gooey filter 让相邻亮点产生黏连效果（可关闭）
+           - 移动端禁用
+           ================================================================ */
+        #pixelTrailCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 99999;
+            filter: url(#pixelGooFilter);
+            mix-blend-mode: difference;
+        }
+        .pixel-goo-svg {
+            position: fixed;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+        }
+        /* dark 主题：白点反色后变黑点（在浅背景上明显） */
+        [data-theme="dark"] #pixelTrailCanvas { mix-blend-mode: screen; }
+        [data-theme="green"] #pixelTrailCanvas { mix-blend-mode: screen; }
+        /* 移动端禁用 */
+        @media (max-width: 768px), (hover: none) {
+            #pixelTrailCanvas { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- ==================== Galaxy 星空背景画布 ==================== -->
+    <canvas id="galaxyCanvas"></canvas>
+
+    <!-- ==================== 导航栏 ==================== -->
+    <nav class="nav" id="navbar">
+        <div class="nav-inner">
+            <a href="#home" class="nav-logo">⚡ LK</a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#about">关于</a></li>
+                <li><a href="#education">教育</a></li>
+                <li><a href="#honors">荣誉</a></li>
+                <li><a href="#hobbies">热爱</a></li>
+                <li><a href="#skills">技能</a></li>
+                <li><a href="#projects">项目</a></li>
+                <li><a href="#contact">联系</a></li>
+                <li class="theme-group">
+                    <button class="theme-btn active" data-theme="light" title="日间模式">☀️</button>
+                    <button class="theme-btn" data-theme="dark" title="夜间模式">🌙</button>
+                    <button class="theme-btn" data-theme="green" title="绿屏模式">💚</button>
+                </li>
+            </ul>
+            <button class="hamburger" id="hamburger" aria-label="菜单">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+        <div class="nav-progress" id="navProgress"></div>
+    </nav>
+
+    <!-- ==================== Hero ==================== -->
+    <section class="hero" id="home">
+        <canvas class="hero-canvas" id="heroCanvas"></canvas>
+        <div class="hero-content">
+            <div class="hero-pixel-frame">
+                <h1 class="hero-name">
+                    <span class="stroke-text" id="strokeTitle" style="--stroke-text-height:140px;" role="img" aria-label="罗光锟">
+                        <svg class="stroke-text__svg" viewBox="0 -100 600 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                            <defs>
+                                <clipPath id="wipeTitle" clipPathUnits="userSpaceOnUse">
+                                    <rect class="wipe-rect" x="0" y="-100" width="0" height="140"/>
+                                </clipPath>
+                            </defs>
+                            <text class="stroke-text__stroke" x="0" y="0" fill="none" stroke="#A78BFA" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" style="font-size:96px;font-weight:800;letter-spacing:-4px;font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;">
+                                <tspan data-stroke-char style="--i:0">罗</tspan><tspan data-stroke-char style="--i:1">光</tspan><tspan data-stroke-char style="--i:2">锟</tspan>
+                            </text>
+                            <text class="stroke-text__fill" x="0" y="0" fill="#F8FAFC" stroke="none" style="font-size:96px;font-weight:800;letter-spacing:-4px;font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;" clip-path="url(#wipeTitle)">
+                                <tspan data-fill-char>罗光锟</tspan>
+                            </text>
+                        </svg>
+                    </span>
+                </h1>
+                <p class="hero-sub">
+                    <span class="stroke-text" id="strokeSub" style="--stroke-text-height:48px;" role="img" aria-label="永远爱抬杠 · 热衷挑战一切的 ENTP">
+                        <svg class="stroke-text__svg" viewBox="0 -36 900 48" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                            <defs>
+                                <clipPath id="wipeSub" clipPathUnits="userSpaceOnUse">
+                                    <rect class="wipe-rect" x="0" y="-36" width="0" height="48"/>
+                                </clipPath>
+                            </defs>
+                            <text class="stroke-text__stroke" x="0" y="0" fill="none" stroke="#A78BFA" stroke-width="1.0" stroke-linejoin="round" stroke-linecap="round" style="font-size:28px;font-weight:700;letter-spacing:-0.5px;font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;">
+                                <tspan data-stroke-char style="--i:0">永</tspan><tspan data-stroke-char style="--i:1">远</tspan><tspan data-stroke-char style="--i:2">爱</tspan><tspan data-stroke-char style="--i:3">抬</tspan><tspan data-stroke-char style="--i:4">杠</tspan><tspan data-stroke-char style="--i:5"> </tspan><tspan data-stroke-char style="--i:6">·</tspan><tspan data-stroke-char style="--i:7"> </tspan><tspan data-stroke-char style="--i:8">热</tspan><tspan data-stroke-char style="--i:9">衷</tspan><tspan data-stroke-char style="--i:10">挑</tspan><tspan data-stroke-char style="--i:11">战</tspan><tspan data-stroke-char style="--i:12">一</tspan><tspan data-stroke-char style="--i:13">切</tspan><tspan data-stroke-char style="--i:14">的</tspan><tspan data-stroke-char style="--i:15"> </tspan><tspan data-stroke-char style="--i:16">E</tspan><tspan data-stroke-char style="--i:17">N</tspan><tspan data-stroke-char style="--i:18">T</tspan><tspan data-stroke-char style="--i:19">P</tspan>
+                            </text>
+                            <text class="stroke-text__fill" x="0" y="0" fill="#F8FAFC" stroke="none" style="font-size:28px;font-weight:700;letter-spacing:-0.5px;font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;" clip-path="url(#wipeSub)">
+                                <tspan data-fill-char>永远爱抬杠 · 热衷挑战一切的 ENTP</tspan>
+                            </text>
+                        </svg>
+                    </span>
+                </p>
+                <p class="hero-en">
+                    → <span class="en-accent">GK·KUN</span> · 足球斗士 · 滑板漫游者 · 泳池破浪者 ←
+                </p>
+            </div>
+        </div>
+        <div class="scroll-hint" id="scrollHint">
+            <span>SCROLL</span>
+            <span class="arrow">▼</span>
+        </div>
+    </section>
+
+    <!-- ==================== 关于我 ==================== -->
+    <section class="section fade-section" id="about">
+        <div class="pixel-divider"></div>
+        <h2 class="section-title">⚿ 关 于 我 ⚿</h2>
+        <p class="section-subtitle">ABOUT ME</p>
+        <div class="profile-card-stage" id="profileCardStage">
+            <div class="pc-card-wrapper" id="profileCard">
+                <div class="pc-behind"></div>
+                <div class="pc-card-shell">
+                    <section class="pc-card">
+                        <div class="pc-inside">
+                            <div class="pc-shine"></div>
+                            <div class="pc-glare"></div>
+                            <div class="pc-content pc-avatar-content">
+                                <img class="avatar" src="微信图片_20260819125425_36_404.jpg" alt="罗光锟" loading="lazy" />
+                                <div class="pc-user-info">
+                                    <div class="pc-user-details">
+                                        <div class="pc-mini-avatar">
+                                            <img src="微信图片_20260819125425_36_404.jpg" alt="罗光锟" loading="lazy" />
+                                        </div>
+                                        <div class="pc-user-text">
+                                            <div class="pc-handle">@GK·KUN</div>
+                                            <div class="pc-status">Online</div>
+                                        </div>
+                                    </div>
+                                    <button class="pc-contact-btn" type="button" aria-label="联系罗光锟">联系我</button>
+                                </div>
+                            </div>
+                            <div class="pc-content">
+                                <div class="pc-details">
+                                    <h3>罗光锟</h3>
+                                    <p>ENTP · 永远爱抬杠的挑战者</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+        <div class="about-card">
+            <p>嘿，我是<span class="highlight">罗光锟</span>，永远爱抬杠、热衷挑战一切的 <span class="highlight-green">ENTP</span>。</p>
+            <p>白昼，我是<span class="highlight">足球场冲刺的斗士</span>，盘带过人撕破防线；傍晚，我踩着<span class="highlight-amber">滑板穿梭街巷</span>，借板轮接住晚风；闲暇时刻扎进<span class="highlight">泳池</span>，任由水波冲刷所有沉闷思绪。</p>
+            <p>我信奉<span class="highlight-green">无论多少岁，好胜心万岁</span>。年龄从来不是收敛锋芒的理由——无论是赛场对抗时的全力角逐，练滑板动作反复摔倒再站起，还是泳池里较劲竞速，每一次拼尽全力，都是<span class="highlight">鲜活热烈的自我证明</span>。</p>
+            <p style="color:var(--text-sub);font-size:0.9rem;margin-top:1.5rem;">
+                寥寥文字仅能勾勒我的一角<br />期待往后，你能看见完整鲜活的我 ✨
+            </p>
+            <div style="text-align:center;">
+                <span class="mbti-badge">⚡ ENTP ⚡</span>
+            </div>
+            <div class="about-tags">
+                <span class="about-tag">⚽ 足球竞技者</span>
+                <span class="about-tag">🛹 滑板漫游者</span>
+                <span class="about-tag">🏊 泳池破浪者</span>
+                <span class="about-tag">🔥 永不服输选手</span>
+                <span class="about-tag">💡 脑洞辩论家</span>
+                <span class="about-tag">⚔ 天生挑战者</span>
+                <span class="about-tag">🏃 永远热血</span>
+                <span class="about-tag">✨ 胜负皆尽兴</span>
+                <span class="about-tag">🎮 自在独行玩家</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== 教育背景 ==================== -->
+    <section class="section fade-section" id="education">
+        <div class="pixel-divider"></div>
+        <h2 class="section-title">🎓 教 育 背 景</h2>
+        <p class="section-subtitle">EDUCATION</p>
+        <div class="edu-card">
+            <div class="edu-title">🏫 兰州石化职业技术大学</div>
+            <div class="edu-detail">
+                <strong>物联网工程技术专业</strong>（2026级新生）<br />
+                2026年9月 – 2029年6月（预期）<br />
+                <span style="color:var(--text-sub);">主修方向：物联网应用技术、传感器网络、嵌入式基础、数据采集与处理</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== 我的荣誉 ==================== -->
+    <section class="section fade-section" id="honors">
+        <div class="pixel-divider"></div>
+        <h2 class="section-title">🏆 我 的 荣 誉</h2>
+        <p class="section-subtitle">HONORS</p>
+        <!-- 手风琴式荣誉画廊：hover/click 切换展开。下方 label 文字可替换为具体荣誉名 -->
+        <div class="accordion-gallery" id="honorsGallery" role="list" aria-label="荣誉画廊">
+            <a class="ag-panel ag-panel--left" href="certificate.png" role="listitem" tabindex="0" aria-label="荣誉证书 1">
+                <span class="ag-panel__frame">
+                    <span class="ag-panel__media"><img src="certificate.png" alt="荣誉证书 1" draggable="false" /></span>
+                    <span class="ag-panel__overlay" aria-hidden="true"></span>
+                </span>
+                <span class="ag-panel__label" aria-hidden="true">
+                    <span class="ag-panel__bar"></span>
+                    <span class="ag-panel__text">荣誉证书 1</span>
+                </span>
+            </a>
+            <a class="ag-panel ag-panel--left" href="img_01a703fedf5da21e24b7c8ead64d398a.png" role="listitem" tabindex="0" aria-label="荣誉证书 2">
+                <span class="ag-panel__frame">
+                    <span class="ag-panel__media"><img src="img_01a703fedf5da21e24b7c8ead64d398a.png" alt="荣誉证书 2" draggable="false" /></span>
+                    <span class="ag-panel__overlay" aria-hidden="true"></span>
+                </span>
+                <span class="ag-panel__label" aria-hidden="true">
+                    <span class="ag-panel__bar"></span>
+                    <span class="ag-panel__text">荣誉证书 2</span>
+                </span>
+            </a>
+            <a class="ag-panel ag-panel--left" href="img_3104159ad4fa2b5f4a9608ccb10cc1d0.png" role="listitem" tabindex="0" aria-label="荣誉证书 3">
+                <span class="ag-panel__frame">
+                    <span class="ag-panel__media"><img src="img_3104159ad4fa2b5f4a9608ccb10cc1d0.png" alt="荣誉证书 3" draggable="false" /></span>
+                    <span class="ag-panel__overlay" aria-hidden="true"></span>
+                </span>
+                <span class="ag-panel__label" aria-hidden="true">
+                    <span class="ag-panel__bar"></span>
+                    <span class="ag-panel__text">荣誉证书 3</span>
+                </span>
+            </a>
+            <a class="ag-panel ag-panel--left ag-panel--active" href="img_4e778ba53f95e84a7bc7c0f03cf8154b.png" role="listitem" tabindex="0" aria-label="荣誉证书 4" aria-current="true">
+                <span class="ag-panel__frame">
+                    <span class="ag-panel__media"><img src="img_4e778ba53f95e84a7bc7c0f03cf8154b.png" alt="荣誉证书 4" draggable="false" /></span>
+                    <span class="ag-panel__overlay" aria-hidden="true"></span>
+                </span>
+                <span class="ag-panel__label" aria-hidden="true">
+                    <span class="ag-panel__bar"></span>
+                    <span class="ag-panel__text">荣誉证书 4</span>
+                </span>
+            </a>
+            <a class="ag-panel ag-panel--right" href="img_b673ee6587404ac11266424a7522bfb5.png" role="listitem" tabindex="0" aria-label="荣誉证书 5">
+                <span class="ag-panel__frame">
+                    <span class="ag-panel__media"><img src="img_b673ee6587404ac11266424a7522bfb5.png" alt="荣誉证书 5" draggable="false" /></span>
+                    <span class="ag-panel__overlay" aria-hidden="true"></span>
+                </span>
+                <span class="ag-panel__label" aria-hidden="true">
+                    <span class="ag-panel__bar"></span>
+                    <span class="ag-panel__text">荣誉证书 5</span>
+                </span>
+            </a>
+            <a class="ag-panel ag-panel--right" href="img_d25feefa38393aa112c420f4a2c913cd.png" role="listitem" tabindex="0" aria-label="荣誉证书 6">
+                <span class="ag-panel__frame">
+                    <span class="ag-panel__media"><img src="img_d25feefa38393aa112c420f4a2c913cd.png" alt="荣誉证书 6" draggable="false" /></span>
+                    <span class="ag-panel__overlay" aria-hidden="true"></span>
+                </span>
+                <span class="ag-panel__label" aria-hidden="true">
+                    <span class="ag-panel__bar"></span>
+                    <span class="ag-panel__text">荣誉证书 6</span>
+                </span>
+            </a>
+            <a class="ag-panel ag-panel--right" href="img_e312379d154c01a6b6b797bdce59bb43.png" role="listitem" tabindex="0" aria-label="荣誉证书 7">
+                <span class="ag-panel__frame">
+                    <span class="ag-panel__media"><img src="img_e312379d154c01a6b6b797bdce59bb43.png" alt="荣誉证书 7" draggable="false" /></span>
+                    <span class="ag-panel__overlay" aria-hidden="true"></span>
+                </span>
+                <span class="ag-panel__label" aria-hidden="true">
+                    <span class="ag-panel__bar"></span>
+                    <span class="ag-panel__text">荣誉证书 7</span>
+                </span>
+            </a>
+        </div>
+    </section>
+
+    <!-- ==================== 热爱 ==================== -->
+    <section class="section fade-section" id="hobbies">
+        <div class="pixel-divider"></div>
+        <h2 class="section-title">❤ 我 的 热 爱 ❤</h2>
+        <p class="section-subtitle">HOBBIES</p>
+        <div class="hobby-grid">
+            <div class="hobby-item">
+                <div class="hobby-icon">⚽</div>
+                <div class="hobby-name">足球竞技</div>
+                <div class="hobby-bar-wrap"><div class="hobby-bar-fill" data-width="92"></div></div>
+                <div class="hobby-level">LV.92</div>
+            </div>
+            <div class="hobby-item">
+                <div class="hobby-icon">🛹</div>
+                <div class="hobby-name">滑板漫游</div>
+                <div class="hobby-bar-wrap"><div class="hobby-bar-fill green" data-width="78"></div></div>
+                <div class="hobby-level">LV.78</div>
+            </div>
+            <div class="hobby-item">
+                <div class="hobby-icon">🏊</div>
+                <div class="hobby-name">泳池破浪</div>
+                <div class="hobby-bar-wrap"><div class="hobby-bar-fill green" data-width="85"></div></div>
+                <div class="hobby-level">LV.85</div>
+            </div>
+            <div class="hobby-item">
+                <div class="hobby-icon">🏸</div>
+                <div class="hobby-name">羽毛球</div>
+                <div class="hobby-bar-wrap"><div class="hobby-bar-fill amber" data-width="70"></div></div>
+                <div class="hobby-level">LV.70</div>
+            </div>
+            <div class="hobby-item">
+                <div class="hobby-icon">🧠</div>
+                <div class="hobby-name">脑洞辩论</div>
+                <div class="hobby-bar-wrap"><div class="hobby-bar-fill" data-width="95"></div></div>
+                <div class="hobby-level">LV.95</div>
+            </div>
+            <div class="hobby-item">
+                <div class="hobby-icon">⚔</div>
+                <div class="hobby-name">挑战一切</div>
+                <div class="hobby-bar-wrap"><div class="hobby-bar-fill green" data-width="88"></div></div>
+                <div class="hobby-level">LV.88</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== 技能 ==================== -->
+    <section class="section fade-section" id="skills">
+        <div class="pixel-divider"></div>
+        <h2 class="section-title">⚔ 技 能 树 ⚔</h2>
+        <p class="section-subtitle">SKILL TREE</p>
+
+        <div class="skills-grid">
+            <!-- 1. 办公与可视化 -->
+            <div class="skill-card">
+                <div class="skill-card-title">📊 办公与可视化</div>
+
+                <div class="skill-item">
+                    <span class="skill-item-title">PPT 设计与制作</span>
+                    <div class="skill-item-desc">
+                        熟练运用 PowerPoint / WPS / Keynote 完成主题汇报、社团招新、活动策划等场景的视觉化方案，能够独立输出逻辑清晰、视觉美观的演示文稿
+                    </div>
+                </div>
+
+                <div class="skill-item">
+                    <span class="skill-item-title">AI 辅助优化</span>
+                    <div class="skill-item-desc">
+                        基于 ChatGPT / DeepSeek / Claude 等 LLM 工具，对内容结构、文案表达、版式排版进行迭代优化，构建 <strong>"LLM 生成大纲 → AI 优化文案 → 工具套版式 → 人工微调"</strong> 四步工作流，单份 PPT 制作效率较纯手工提升约 <strong>60%-70%</strong>
+                    </div>
+                </div>
+
+                <div class="skill-item">
+                    <span class="skill-item-title">可视化呈现</span>
+                    <div class="skill-item-desc">
+                        擅长将复杂信息转化为图表 / 流程图 / 信息长图，有效提升信息传递效率与决策理解速度
+                    </div>
+                </div>
+
+                <div class="skill-tags">
+                    <span>PowerPoint</span>
+                    <span>WPS</span>
+                    <span>Keynote</span>
+                    <span class="accent-tag">ChatGPT</span>
+                    <span class="accent-tag">DeepSeek</span>
+                    <span class="accent-tag">Claude</span>
+                    <span>信息可视化</span>
+                </div>
+            </div>
+
+            <!-- 2. 编程与开发 -->
+            <div class="skill-card">
+                <div class="skill-card-title">💻 编程与开发</div>
+
+                <div class="skill-item">
+                    <span class="skill-item-title">Python 编程</span>
+                    <div class="skill-item-desc">
+                        掌握基础语法、变量与流程控制、列表/字典等数据结构，了解 Pandas、Matplotlib 等常用库，能编写自动化脚本与简单爬虫，具备初步的数据处理与可视化能力
+                    </div>
+                </div>
+
+                <div class="skill-item">
+                    <span class="skill-item-title">AI 编码实践</span>
+                    <div class="skill-item-desc">
+                        持有阿里云 <strong>"基于通义灵码实现高效 AI 编码实践"</strong> 认证，能够熟练运用 AI 辅助编程工具提升代码编写与调试效率
+                    </div>
+                </div>
+
+                <div class="skill-item">
+                    <span class="skill-item-title">Spring AI 应用开发</span>
+                    <div class="skill-item-desc">
+                        持有阿里云 <strong>"Spring AI 应用开发（入门）"</strong> 认证，了解基于 Spring 框架的 AI 应用开发基础流程与核心概念
+                    </div>
+                </div>
+
+                <div class="skill-item">
+                    <span class="skill-item-title">版本控制与部署</span>
+                    <div class="skill-item-desc">
+                        拥有个人 GitHub 账号，掌握 HTML / CSS / JavaScript 前端基础及 GitHub Pages 部署流程，正在搭建个人网站与项目仓库
+                    </div>
+                </div>
+
+                <div class="skill-tags">
+                    <span>Python</span>
+                    <span>Pandas</span>
+                    <span>Matplotlib</span>
+                    <span class="accent-tag">通义灵码</span>
+                    <span class="accent-tag">Spring AI</span>
+                    <span>GitHub</span>
+                    <span>HTML/CSS/JS</span>
+                </div>
+            </div>
+
+            <!-- 3. AIGC 与设计 -->
+            <div class="skill-card">
+                <div class="skill-card-title">🎨 AIGC 与设计</div>
+
+                <div class="skill-item">
+                    <span class="skill-item-title">AIGC 工具矩阵</span>
+                    <div class="skill-item-desc">
+                        熟练使用 ChatGPT、DeepSeek、Midjourney、Stable Diffusion 等生成式 AI 工具，应用于文案生成、图像创作、代码辅助等多元场景
+                    </div>
+                </div>
+
+                <div class="skill-item">
+                    <span class="skill-item-title">AI 应用构建</span>
+                    <div class="skill-item-desc">
+                        持有阿里云 <strong>"基于百炼平台构建智能体应用"</strong> 认证，具备基于低代码/无代码平台搭建 AI Agent 的实操能力
+                    </div>
+                </div>
+
+                <div class="skill-item">
+                    <span class="skill-item-title">AIGC 设计实践</span>
+                    <div class="skill-item-desc">
+                        持有阿里云 <strong>"基于 PAI ArtLab 的 AIGC 设计基础"</strong> 及 <strong>"VISION 人工智能设计（入门/进阶）"</strong> 多项认证，具备从基础到进阶的 AI 辅助设计能力
+                    </div>
+                </div>
+
+                <div class="skill-tags">
+                    <span class="accent-tag">ChatGPT</span>
+                    <span class="accent-tag">DeepSeek</span>
+                    <span class="accent-tag">Midjourney</span>
+                    <span class="accent-tag">Stable Diffusion</span>
+                    <span>百炼平台</span>
+                    <span>PAI ArtLab</span>
+                    <span>VISION</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 标签云 -->
+        <div class="tag-cloud">
+            <span>⚽ 前场核心</span>
+            <span>🛹 Kickflip</span>
+            <span>🏊 自由泳</span>
+            <span>💡 思辨达人</span>
+            <span>🔥 永不服输</span>
+            <span>⚔ 天生挑战者</span>
+            <span>📈 量化成长</span>
+        </div>
+    </section>
+
+    <!-- ==================== 项目 ==================== -->
+    <section class="section fade-section" id="projects">
+        <div class="pixel-divider"></div>
+        <h2 class="section-title">📁 项 目 经 历</h2>
+        <p class="section-subtitle">PROJECTS</p>
+
+        <div class="project-grid">
+            <div class="project-card tilt-card">
+                <div class="tilt-card-inner">
+                    <div class="project-icon">⚽</div>
+                    <div class="project-name">校园足球 · 前场核心</div>
+                    <div class="project-desc">
+                        7场校内赛 5球4助攻 · 场均盘带突破65% · 进攻效率提升30%<br />
+                        主导6次战术会议 · 2次逆转取胜
+                    </div>
+                    <div class="project-tags">
+                        <span>⚡ 进攻组织</span>
+                        <span>🧠 战术分析</span>
+                        <span>🔥 逆转之王</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card tilt-card">
+                <div class="tilt-card-inner">
+                    <div class="project-icon">🛹</div>
+                    <div class="project-name">滑板 · 极限挑战</div>
+                    <div class="project-desc">
+                        Ollie · Kickflip · Heelflip 成功率20% → 75%+<br />
+                        50+次摔倒复盘 · 3周攻克Kickflip · 较预期缩短40%
+                    </div>
+                    <div class="project-tags">
+                        <span>🔄 复盘迭代</span>
+                        <span>📈 量化进步</span>
+                        <span>💪 韧性训练</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card tilt-card">
+                <div class="tilt-card-inner">
+                    <div class="project-icon">🏊</div>
+                    <div class="project-name">游泳 · 竞速突破</div>
+                    <div class="project-desc">
+                        1,000m自由泳 23′ → 18′30″ · 进步20%<br />
+                        50m划水次数 42 → 36 · 动作效率提升14%
+                    </div>
+                    <div class="project-tags">
+                        <span>🌊 节奏控制</span>
+                        <span>🧘 情绪管理</span>
+                        <span>📊 数据追踪</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card tilt-card">
+                <div class="tilt-card-inner">
+                    <div class="project-icon">🧠</div>
+                    <div class="project-name">ENTP 辩论角</div>
+                    <div class="project-desc">
+                        6期活动 · 120+人次参与 · 满意度4.7/5.0<br />
+                        辩题设计 · 流程主持 · "脑洞最大主持人"
+                    </div>
+                    <div class="project-tags">
+                        <span>💡 思辨设计</span>
+                        <span>🎤 即兴表达</span>
+                        <span>🤝 社群运营</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card tilt-card">
+                <div class="tilt-card-inner">
+                    <div class="project-icon">🌟</div>
+                    <div class="project-name">"好胜心万岁" 成长计划</div>
+                    <div class="project-desc">
+                        3项挑战 · 平均达成率112%<br />
+                        目标设定 → 执行拆解 → 数据追踪 → 复盘迭代
+                    </div>
+                    <div class="project-tags">
+                        <span>📋 目标管理</span>
+                        <span>📊 量化成长</span>
+                        <span>🔄 迭代模型</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== 联系 ==================== -->
+    <section class="section fade-section" id="contact">
+        <div class="pixel-divider"></div>
+        <h2 class="section-title">✉ 联 系 我 ✉</h2>
+        <p class="section-subtitle">CONTACT</p>
+        <div class="contact-card">
+            <p style="font-size:1.1rem;font-weight:700;color:var(--heading);">罗光锟</p>
+            <p style="color:var(--text-sub);font-size:0.9rem;margin:0.5rem 0;">
+                📞 13159399630 &nbsp;·&nbsp; ✉️ 3697157501@qq.com
+            </p>
+            <p style="color:var(--text-sub);font-size:0.85rem;">
+                🎂 2007.12 &nbsp;·&nbsp; 📍 福建三明
+            </p>
+            <div class="contact-price">⚡ 永远热血 · 胜负皆尽兴 ⚡</div>
+            <div class="contact-links">
+                <a href="tel:13159399630" aria-label="电话">📞</a>
+                <button class="contact-btn" id="copyEmail" aria-label="复制邮箱">✉️</button>
+                <a href="https://github.com/lgk-siu" target="_blank" aria-label="GitHub" style="font-size:1.3rem;">🐙</a>
+            </div>
+            <p style="color:var(--text-sub);font-size:0.75rem;margin-top:1rem;">
+                👆 点击 ✉️ 复制邮箱 · 🐙 访问我的 GitHub
+            </p>
+        </div>
+    </section>
+
+    <!-- ==================== 页脚 ==================== -->
+    <footer class="footer">
+        <div>
+            <span class="pixel-heart">♥</span> 罗光锟 · 永远好胜 <span class="pixel-heart">♥</span>
+        </div>
+        <div style="margin-top:0.5rem;font-size:0.65rem;">
+            © 2026 罗光锟 · 像素竞技风 · 支持深浅色 / 打印 PDF
+        </div>
+        <div class="footer-ascii">
+            &lt; ENTP · 足球 · 滑板 · 游泳 /&gt;
+        </div>
+    </footer>
+
+    <!-- ==================== 回到顶部 ==================== -->
+    <button id="back-to-top" aria-label="返回顶部">↑</button>
+
+    <script>
+        // ================================================================
+        //  罗光锟 — 像素竞技风个人主页
+        //  粒子画布 · 3D 卡片倾斜 · 滚动动画 · 主题切换 · 打字机效果
+        // ================================================================
+
+        (function() {
+            'use strict';
+
+            // ----- 1. 粒子画布 -----
+            const canvas = document.getElementById('heroCanvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let mouseX = -9999;
+            let mouseY = -9999;
+
+            function resizeCanvas() {
+                const rect = canvas.parentElement.getBoundingClientRect();
+                canvas.width = rect.width || window.innerWidth;
+                canvas.height = rect.height || window.innerHeight;
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            class Particle {
+                constructor() {
+                    this.reset();
+                }
+                reset() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 2 + 0.5;
+                    this.speedX = (Math.random() - 0.5) * 0.4;
+                    this.speedY = (Math.random() - 0.5) * 0.4;
+                    this.opacity = Math.random() * 0.5 + 0.2;
+                }
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+                }
+                draw() {
+                    const dx = this.x - mouseX;
+                    const dy = this.y - mouseY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    let alpha = this.opacity;
+                    let size = this.size;
+                    if (dist < 120) {
+                        alpha = Math.min(1, alpha + 0.3);
+                        size = this.size * 1.4;
+                    }
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(225, 29, 72, ${alpha})`;
+                    ctx.fill();
+                }
+            }
+
+            const count = Math.min(120, Math.floor((canvas.width * canvas.height) / 8000));
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
+
+            function animateParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => { p.update();
+                    p.draw(); });
+                // 连线
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 100) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(225, 29, 72, ${0.08 * (1 - dist / 100)})`;
+                            ctx.lineWidth = 0.6;
+                            ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(animateParticles);
+            }
+            animateParticles();
+
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                mouseX = e.clientX - rect.left;
+                mouseY = e.clientY - rect.top;
+            });
+            canvas.addEventListener('mouseleave', () => {
+                mouseX = -9999;
+                mouseY = -9999;
+            });
+
+            // ----- 2. （已废弃）打字机效果 -----  replaced by StrokeText SVG 描边动画
+
+            // ----- 3. 滚动动画 (fade-section) -----
+            const fadeSections = document.querySelectorAll('.fade-section');
+
+            function checkVisibility() {
+                const triggerBottom = window.innerHeight * 0.85;
+                fadeSections.forEach(sec => {
+                    const top = sec.getBoundingClientRect().top;
+                    if (top < triggerBottom) {
+                        sec.classList.add('visible');
+                    }
+                });
+            }
+            window.addEventListener('scroll', checkVisibility);
+            window.addEventListener('load', () => {
+                setTimeout(checkVisibility, 300);
+                setTimeout(() => {
+                    document.querySelectorAll('.hobby-bar-fill, .skill-bar-fill').forEach(bar => {
+                        const w = bar.getAttribute('data-width');
+                        if (w) bar.style.width = w + '%';
+                    });
+                }, 600);
+            });
+
+            // ----- 4. 导航高亮 + 进度条 -----
+            const navLinks = document.querySelectorAll('.nav-links a');
+            const sections = document.querySelectorAll('section[id]');
+            const navProgress = document.getElementById('navProgress');
+
+            function updateNav() {
+                let current = '';
+                const scrollY = window.scrollY + 120;
+                sections.forEach(sec => {
+                    const top = sec.offsetTop;
+                    const height = sec.offsetHeight;
+                    if (scrollY >= top && scrollY < top + height) {
+                        current = sec.id;
+                    }
+                });
+                navLinks.forEach(link => {
+                    const href = link.getAttribute('href');
+                    link.classList.toggle('active', href === '#' + current);
+                });
+
+                // 进度条
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const scrolled = window.scrollY;
+                const progress = docHeight > 0 ? (scrolled / docHeight) * 100 : 0;
+                navProgress.style.width = progress + '%';
+            }
+            window.addEventListener('scroll', updateNav);
+            window.addEventListener('load', updateNav);
+
+            // ----- 5. 汉堡菜单 -----
+            const hamburger = document.getElementById('hamburger');
+            const navLinksContainer = document.getElementById('navLinks');
+            if (hamburger && navLinksContainer) {
+                hamburger.addEventListener('click', () => {
+                    hamburger.classList.toggle('open');
+                    navLinksContainer.classList.toggle('open');
+                });
+                // 点击链接后关闭菜单
+                navLinksContainer.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        hamburger.classList.remove('open');
+                        navLinksContainer.classList.remove('open');
+                    });
+                });
+            }
+
+            // ----- 6. 主题切换 -----
+            const themeBtns = document.querySelectorAll('.theme-btn');
+            const html = document.documentElement;
+
+            function setTheme(theme) {
+                html.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+                themeBtns.forEach(btn => {
+                    btn.classList.toggle('active', btn.getAttribute('data-theme') === theme);
+                });
+                // 更新粒子颜色
+                const isGreen = theme === 'green';
+                const isDark = theme === 'dark';
+                let color = '225, 29, 72';
+                if (isGreen) color = '0, 255, 65';
+                else if (isDark) color = '251, 113, 133';
+                // 重新绘制粒子时会使用新颜色，但需要重置样式
+                // 简单方案：刷新页面风格，但为了体验，我们动态更新绘制逻辑中的颜色
+                // 由于粒子绘制是在动画循环中，我们用一个变量来控制
+                window.__particleColor = color;
+            }
+
+            // 读取存储的主题
+            const storedTheme = localStorage.getItem('theme');
+            const preferred = storedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' :
+                'light');
+            setTheme(preferred);
+
+            themeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const theme = btn.getAttribute('data-theme');
+                    setTheme(theme);
+                });
+            });
+
+            // 覆写粒子绘制以使用主题色
+            const originalDraw = Particle.prototype.draw;
+            Particle.prototype.draw = function() {
+                const dx = this.x - mouseX;
+                const dy = this.y - mouseY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                let alpha = this.opacity;
+                let size = this.size;
+                if (dist < 120) {
+                    alpha = Math.min(1, alpha + 0.3);
+                    size = this.size * 1.4;
+                }
+                const color = window.__particleColor || '225, 29, 72';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${color}, ${alpha})`;
+                ctx.fill();
+            };
+
+            // 连线颜色也动态
+            const origAnimate = animateParticles;
+            // 重新定义动画循环以使用动态颜色
+            // 由于已经启动，我们替换绘制逻辑
+            // 直接修改全局的绘制函数
+            const superDraw = Particle.prototype.draw;
+            // 已经替换
+
+            // ----- 7. 3D 卡片倾斜 -----
+            document.querySelectorAll('.tilt-card').forEach(card => {
+                const inner = card.querySelector('.tilt-card-inner');
+                if (!inner) return;
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = (e.clientX - rect.left) / rect.width - 0.5;
+                    const y = (e.clientY - rect.top) / rect.height - 0.5;
+                    const rotateX = y * -12;
+                    const rotateY = x * 12;
+                    inner.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                });
+                card.addEventListener('mouseleave', () => {
+                    inner.style.transform = 'rotateX(0) rotateY(0)';
+                });
+            });
+
+            // ----- 8. 复制邮箱 (防爬虫拼接) -----
+            const copyBtn = document.getElementById('copyEmail');
+            if (copyBtn) {
+                const email = '3697157501@qq.com';
+                copyBtn.addEventListener('click', () => {
+                    if (navigator.clipboard) {
+                        navigator.clipboard.writeText(email).then(() => {
+                            copyBtn.textContent = '✅';
+                            setTimeout(() => copyBtn.textContent = '✉️', 1500);
+                        }).catch(() => fallbackCopy(email, copyBtn));
+                    } else {
+                        fallbackCopy(email, copyBtn);
+                    }
+                });
+            }
+
+            function fallbackCopy(text, btn) {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                try {
+                    document.execCommand('copy');
+                    btn.textContent = '✅';
+                    setTimeout(() => btn.textContent = '✉️', 1500);
+                } catch (_) {
+                    btn.textContent = '❌';
+                    setTimeout(() => btn.textContent = '✉️', 1500);
+                }
+                document.body.removeChild(ta);
+            }
+
+            // ----- 9. 回到顶部 -----
+            const backTop = document.getElementById('back-to-top');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 500) {
+                    backTop.classList.add('visible');
+                } else {
+                    backTop.classList.remove('visible');
+                }
+            });
+            backTop.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // ----- 10. 打印时展开所有内容 -----
+            window.addEventListener('beforeprint', () => {
+                document.querySelectorAll('.fade-section').forEach(el => el.classList.add('visible'));
+            });
+
+            // ----- 11. 键盘左右切换主题 (彩蛋) -----
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                    const themes = ['light', 'dark', 'green'];
+                    const current = html.getAttribute('data-theme') || 'light';
+                    let idx = themes.indexOf(current);
+                    if (e.key === 'ArrowRight') idx = (idx + 1) % themes.length;
+                    else idx = (idx - 1 + themes.length) % themes.length;
+                    setTheme(themes[idx]);
+                }
+            });
+
+            console.log('⚡ 罗光锟 · 像素竞技风已加载 ⚡');
+        })();
+
+        /* ================================================================
+           ProfileCard · Tilt 引擎（pointer-follow 3D + initial 动画）
+           复刻 React 版 tiltEngine：setImmediate/setTarget/toCenter/beginInitial
+           ================================================================ */
+        (function () {
+            const wrapper = document.getElementById('profileCard');
+            if (!wrapper) return;
+            const shell = wrapper.querySelector('.pc-card-shell');
+            if (!shell) return;
+
+            const ANIMATION_CONFIG = {
+                INITIAL_DURATION: 1200,
+                INITIAL_X_OFFSET: 70,
+                INITIAL_Y_OFFSET: 60,
+                ENTER_TRANSITION_MS: 180
+            };
+            const DEFAULT_TAU = 0.14;
+            const INITIAL_TAU = 0.6;
+
+            const clamp = (v, min = 0, max = 100) => Math.min(Math.max(v, min), max);
+            const round = (v, precision = 3) => parseFloat(v.toFixed(precision));
+            const adjust = (v, fMin, fMax, tMin, tMax) =>
+                round(tMin + ((tMax - tMin) * (v - fMin)) / (fMax - fMin));
+
+            let rafId = null, running = false, lastTs = 0;
+            let currentX = 0, currentY = 0, targetX = 0, targetY = 0;
+            let initialUntil = 0;
+            let enterTimer = null, leaveRaf = null;
+
+            function setVarsFromXY(x, y) {
+                const width = shell.clientWidth || 1;
+                const height = shell.clientHeight || 1;
+                const percentX = clamp((100 / width) * x);
+                const percentY = clamp((100 / height) * y);
+                const centerX = percentX - 50;
+                const centerY = percentY - 50;
+
+                wrapper.style.setProperty('--pointer-x', `${percentX}%`);
+                wrapper.style.setProperty('--pointer-y', `${percentY}%`);
+                wrapper.style.setProperty('--background-x', `${adjust(percentX, 0, 100, 35, 65)}%`);
+                wrapper.style.setProperty('--background-y', `${adjust(percentY, 0, 100, 35, 65)}%`);
+                wrapper.style.setProperty('--pointer-from-center',
+                    `${clamp(Math.hypot(percentY - 50, percentX - 50) / 50, 0, 1)}`);
+                wrapper.style.setProperty('--pointer-from-top', `${percentY / 100}`);
+                wrapper.style.setProperty('--pointer-from-left', `${percentX / 100}`);
+                wrapper.style.setProperty('--rotate-x', `${round(-(centerX / 5))}deg`);
+                wrapper.style.setProperty('--rotate-y', `${round(centerY / 4)}deg`);
+            }
+
+            function step(ts) {
+                if (!running) return;
+                if (lastTs === 0) lastTs = ts;
+                const dt = (ts - lastTs) / 1000;
+                lastTs = ts;
+
+                const tau = ts < initialUntil ? INITIAL_TAU : DEFAULT_TAU;
+                const k = 1 - Math.exp(-dt / tau);
+
+                currentX += (targetX - currentX) * k;
+                currentY += (targetY - currentY) * k;
+
+                setVarsFromXY(currentX, currentY);
+
+                const stillFar =
+                    Math.abs(targetX - currentX) > 0.05 ||
+                    Math.abs(targetY - currentY) > 0.05;
+
+                if (stillFar || document.hasFocus()) {
+                    rafId = requestAnimationFrame(step);
+                } else {
+                    running = false; lastTs = 0;
+                    if (rafId) cancelAnimationFrame(rafId);
+                    rafId = null;
+                }
+            }
+
+            function start() {
+                if (running) return;
+                running = true; lastTs = 0;
+                rafId = requestAnimationFrame(step);
+            }
+
+            function setImmediate(x, y) {
+                currentX = x; currentY = y;
+                setVarsFromXY(currentX, currentY);
+            }
+            function setTarget(x, y) { targetX = x; targetY = y; start(); }
+            function toCenter() {
+                setTarget(shell.clientWidth / 2, shell.clientHeight / 2);
+            }
+            function beginInitial(durationMs) {
+                initialUntil = performance.now() + durationMs;
+                start();
+            }
+
+            function getOffsets(evt) {
+                const rect = shell.getBoundingClientRect();
+                return { x: evt.clientX - rect.left, y: evt.clientY - rect.top };
+            }
+
+            function handleMove(e) {
+                const { x, y } = getOffsets(e);
+                setTarget(x, y);
+            }
+            function handleEnter(e) {
+                shell.classList.add('active');
+                shell.classList.add('entering');
+                if (enterTimer) clearTimeout(enterTimer);
+                enterTimer = setTimeout(() => shell.classList.remove('entering'),
+                    ANIMATION_CONFIG.ENTER_TRANSITION_MS);
+                const { x, y } = getOffsets(e);
+                setTarget(x, y);
+            }
+            function handleLeave() {
+                toCenter();
+                const checkSettle = () => {
+                    const settled = Math.hypot(targetX - currentX, targetY - currentY) < 0.6;
+                    if (settled) {
+                        shell.classList.remove('active');
+                        leaveRaf = null;
+                    } else {
+                        leaveRaf = requestAnimationFrame(checkSettle);
+                    }
+                };
+                if (leaveRaf) cancelAnimationFrame(leaveRaf);
+                leaveRaf = requestAnimationFrame(checkSettle);
+            }
+
+            shell.addEventListener('pointerenter', handleEnter);
+            shell.addEventListener('pointermove', handleMove);
+            shell.addEventListener('pointerleave', handleLeave);
+
+            // 初始入场动画：从右上角滑回中心
+            const initialX = (shell.clientWidth || 0) - ANIMATION_CONFIG.INITIAL_X_OFFSET;
+            const initialY = ANIMATION_CONFIG.INITIAL_Y_OFFSET;
+            setImmediate(initialX, initialY);
+            toCenter();
+            beginInitial(ANIMATION_CONFIG.INITIAL_DURATION);
+
+            // 联系按钮：滚到底部 footer
+            const contactBtn = wrapper.querySelector('.pc-contact-btn');
+            if (contactBtn) {
+                contactBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const footer = document.querySelector('footer');
+                    if (footer) footer.scrollIntoView({ behavior: 'smooth' });
+                });
+            }
+
+            // 主题切换时刷新光晕颜色由 CSS 变量接管，无需 JS 干预
+        })();
+
+        /* ================================================================
+           Galaxy 星空背景（原生 WebGL 复刻 React + ogl 版 Galaxy）
+           全屏 triangle + starfield fragment shader + RAF 时间/鼠标
+           ================================================================ */
+        (function () {
+            const canvas = document.getElementById('galaxyCanvas');
+            if (!canvas) return;
+            const gl = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: false, antialias: false })
+                || canvas.getContext('experimental-webgl', { alpha: true, premultipliedAlpha: false, antialias: false });
+            if (!gl) return;
+
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+            gl.clearColor(0, 0, 0, 0);
+
+            const vertexShader = `
+                attribute vec2 uv;
+                attribute vec2 position;
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = vec4(position, 0.0, 1.0);
+                }
+            `;
+
+            // 注：原 React 版本中 bool uniform 在 WebGL1 GLSL ES 1.0 不支持，
+            // 这里改用 float（>0.5 视为 true），逻辑等价。
+            const fragmentShader = `
+                precision highp float;
+                uniform float uTime;
+                uniform vec3 uResolution;
+                uniform vec2 uFocal;
+                uniform vec2 uRotation;
+                uniform float uStarSpeed;
+                uniform float uDensity;
+                uniform float uHueShift;
+                uniform float uSpeed;
+                uniform vec2 uMouse;
+                uniform float uGlowIntensity;
+                uniform float uSaturation;
+                uniform float uMouseRepulsion;
+                uniform float uTwinkleIntensity;
+                uniform float uRotationSpeed;
+                uniform float uRepulsionStrength;
+                uniform float uMouseActiveFactor;
+                uniform float uAutoCenterRepulsion;
+                uniform float uTransparent;
+                varying vec2 vUv;
+
+                #define NUM_LAYER 4.0
+                #define STAR_COLOR_CUTOFF 0.2
+                #define MAT45 mat2(0.7071, -0.7071, 0.7071, 0.7071)
+                #define PERIOD 3.0
+
+                float Hash21(vec2 p) {
+                    p = fract(p * vec2(123.34, 456.21));
+                    p += dot(p, p + 45.32);
+                    return fract(p.x * p.y);
+                }
+                float tri(float x) { return abs(fract(x) * 2.0 - 1.0); }
+                float tris(float x) {
+                    float t = fract(x);
+                    return 1.0 - smoothstep(0.0, 1.0, abs(2.0 * t - 1.0));
+                }
+                float trisn(float x) {
+                    float t = fract(x);
+                    return 2.0 * (1.0 - smoothstep(0.0, 1.0, abs(2.0 * t - 1.0))) - 1.0;
+                }
+                vec3 hsv2rgb(vec3 c) {
+                    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+                    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+                    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+                }
+                float Star(vec2 uv, float flare) {
+                    float d = length(uv);
+                    float m = (0.05 * uGlowIntensity) / d;
+                    float rays = smoothstep(0.0, 1.0, 1.0 - abs(uv.x * uv.y * 1000.0));
+                    m += rays * flare * uGlowIntensity;
+                    uv *= MAT45;
+                    rays = smoothstep(0.0, 1.0, 1.0 - abs(uv.x * uv.y * 1000.0));
+                    m += rays * 0.3 * flare * uGlowIntensity;
+                    m *= smoothstep(1.0, 0.2, d);
+                    return m;
+                }
+                vec3 StarLayer(vec2 uv) {
+                    vec3 col = vec3(0.0);
+                    vec2 gv = fract(uv) - 0.5;
+                    vec2 id = floor(uv);
+                    for (int y = -1; y <= 1; y++) {
+                        for (int x = -1; x <= 1; x++) {
+                            vec2 offset = vec2(float(x), float(y));
+                            vec2 si = id + vec2(float(x), float(y));
+                            float seed = Hash21(si);
+                            float size = fract(seed * 345.32);
+                            float glossLocal = tri(uStarSpeed / (PERIOD * seed + 1.0));
+                            float flareSize = smoothstep(0.9, 1.0, size) * glossLocal;
+                            float red = smoothstep(STAR_COLOR_CUTOFF, 1.0, Hash21(si + 1.0)) + STAR_COLOR_CUTOFF;
+                            float blu = smoothstep(STAR_COLOR_CUTOFF, 1.0, Hash21(si + 3.0)) + STAR_COLOR_CUTOFF;
+                            float grn = min(red, blu) * seed;
+                            vec3 base = vec3(red, grn, blu);
+                            float hue = atan(base.g - base.r, base.b - base.r) / (2.0 * 3.14159) + 0.5;
+                            hue = fract(hue + uHueShift / 360.0);
+                            float sat = length(base - vec3(dot(base, vec3(0.299, 0.587, 0.114)))) * uSaturation;
+                            float val = max(max(base.r, base.g), base.b);
+                            base = hsv2rgb(vec3(hue, sat, val));
+                            vec2 pad = vec2(tris(seed * 34.0 + uTime * uSpeed / 10.0), tris(seed * 38.0 + uTime * uSpeed / 30.0)) - 0.5;
+                            float star = Star(gv - offset - pad, flareSize);
+                            vec3 color = base;
+                            float twinkle = trisn(uTime * uSpeed + seed * 6.2831) * 0.5 + 1.0;
+                            twinkle = mix(1.0, twinkle, uTwinkleIntensity);
+                            star *= twinkle;
+                            col += star * size * color;
+                        }
+                    }
+                    return col;
+                }
+                void main() {
+                    vec2 focalPx = uFocal * uResolution.xy;
+                    vec2 uv = (vUv * uResolution.xy - focalPx) / uResolution.y;
+                    vec2 mouseNorm = uMouse - vec2(0.5);
+                    if (uAutoCenterRepulsion > 0.5) {
+                        vec2 centerUV = vec2(0.0, 0.0);
+                        float centerDist = length(uv - centerUV);
+                        vec2 repulsion = normalize(uv - centerUV) * (uAutoCenterRepulsion / (centerDist + 0.1));
+                        uv += repulsion * 0.05;
+                    } else if (uMouseRepulsion > 0.5) {
+                        vec2 mousePosUV = (uMouse * uResolution.xy - focalPx) / uResolution.y;
+                        float mouseDist = length(uv - mousePosUV);
+                        vec2 repulsion = normalize(uv - mousePosUV) * (uRepulsionStrength / (mouseDist + 0.1));
+                        uv += repulsion * 0.05 * uMouseActiveFactor;
+                    } else {
+                        vec2 mouseOffset = mouseNorm * 0.1 * uMouseActiveFactor;
+                        uv += mouseOffset;
+                    }
+                    float autoRotAngle = uTime * uRotationSpeed;
+                    mat2 autoRot = mat2(cos(autoRotAngle), -sin(autoRotAngle), sin(autoRotAngle), cos(autoRotAngle));
+                    uv = autoRot * uv;
+                    uv = mat2(uRotation.x, -uRotation.y, uRotation.y, uRotation.x) * uv;
+                    vec3 col = vec3(0.0);
+                    for (float i = 0.0; i < 1.0; i += 1.0 / NUM_LAYER) {
+                        float depth = fract(i + uStarSpeed * uSpeed);
+                        float scale = mix(20.0 * uDensity, 0.5 * uDensity, depth);
+                        float fade = depth * smoothstep(1.0, 0.9, depth);
+                        col += StarLayer(uv * scale + i * 453.32) * fade;
+                    }
+                    if (uTransparent > 0.5) {
+                        float alpha = length(col);
+                        alpha = smoothstep(0.0, 0.3, alpha);
+                        alpha = min(alpha, 1.0);
+                        gl_FragColor = vec4(col, alpha);
+                    } else {
+                        gl_FragColor = vec4(col, 1.0);
+                    }
+                }
+            `;
+
+            function compile(type, src) {
+                const sh = gl.createShader(type);
+                gl.shaderSource(sh, src);
+                gl.compileShader(sh);
+                if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+                    console.error('[Galaxy] shader compile error:', gl.getShaderInfoLog(sh));
+                    gl.deleteShader(sh);
+                    return null;
+                }
+                return sh;
+            }
+            const vs = compile(gl.VERTEX_SHADER, vertexShader);
+            const fs = compile(gl.FRAGMENT_SHADER, fragmentShader);
+            if (!vs || !fs) return;
+            const program = gl.createProgram();
+            gl.attachShader(program, vs);
+            gl.attachShader(program, fs);
+            gl.linkProgram(program);
+            if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+                console.error('[Galaxy] program link error:', gl.getProgramInfoLog(program));
+                return;
+            }
+            gl.useProgram(program);
+
+            // 全屏 triangle（覆盖 clip space）
+            const positions = new Float32Array([-1, -1, 3, -1, -1, 3]);
+            const uvs = new Float32Array([0, 0, 2, 0, 0, 2]);
+            const posBuf = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, posBuf);
+            gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+            const aPos = gl.getAttribLocation(program, 'position');
+            gl.enableVertexAttribArray(aPos);
+            gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+            const uvBuf = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, uvBuf);
+            gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.STATIC_DRAW);
+            const aUv = gl.getAttribLocation(program, 'uv');
+            gl.enableVertexAttribArray(aUv);
+            gl.vertexAttribPointer(aUv, 2, gl.FLOAT, false, 0, 0);
+
+            // uniform locations
+            const U = {
+                uTime: gl.getUniformLocation(program, 'uTime'),
+                uResolution: gl.getUniformLocation(program, 'uResolution'),
+                uFocal: gl.getUniformLocation(program, 'uFocal'),
+                uRotation: gl.getUniformLocation(program, 'uRotation'),
+                uStarSpeed: gl.getUniformLocation(program, 'uStarSpeed'),
+                uDensity: gl.getUniformLocation(program, 'uDensity'),
+                uHueShift: gl.getUniformLocation(program, 'uHueShift'),
+                uSpeed: gl.getUniformLocation(program, 'uSpeed'),
+                uMouse: gl.getUniformLocation(program, 'uMouse'),
+                uGlowIntensity: gl.getUniformLocation(program, 'uGlowIntensity'),
+                uSaturation: gl.getUniformLocation(program, 'uSaturation'),
+                uMouseRepulsion: gl.getUniformLocation(program, 'uMouseRepulsion'),
+                uTwinkleIntensity: gl.getUniformLocation(program, 'uTwinkleIntensity'),
+                uRotationSpeed: gl.getUniformLocation(program, 'uRotationSpeed'),
+                uRepulsionStrength: gl.getUniformLocation(program, 'uRepulsionStrength'),
+                uMouseActiveFactor: gl.getUniformLocation(program, 'uMouseActiveFactor'),
+                uAutoCenterRepulsion: gl.getUniformLocation(program, 'uAutoCenterRepulsion'),
+                uTransparent: gl.getUniformLocation(program, 'uTransparent')
+            };
+
+            // Galaxy 默认参数（对齐 React 版默认 props）
+            const PARAMS = {
+                focal: [0.5, 0.5],
+                rotation: [1.0, 0.0],
+                starSpeed: 0.5,
+                density: 1.0,
+                hueShift: 140.0,
+                speed: 1.0,
+                glowIntensity: 0.3,
+                saturation: 0.0,
+                mouseRepulsion: 1.0,   // true
+                twinkleIntensity: 0.3,
+                rotationSpeed: 0.1,
+                repulsionStrength: 2.0,
+                autoCenterRepulsion: 0.0,
+                transparent: 1.0       // true（叠加在 body 底色上）
+            };
+
+            function applyStaticUniforms() {
+                gl.uniform2f(U.uFocal, PARAMS.focal[0], PARAMS.focal[1]);
+                gl.uniform2f(U.uRotation, PARAMS.rotation[0], PARAMS.rotation[1]);
+                gl.uniform1f(U.uDensity, PARAMS.density);
+                gl.uniform1f(U.uHueShift, PARAMS.hueShift);
+                gl.uniform1f(U.uSpeed, PARAMS.speed);
+                gl.uniform1f(U.uGlowIntensity, PARAMS.glowIntensity);
+                gl.uniform1f(U.uSaturation, PARAMS.saturation);
+                gl.uniform1f(U.uMouseRepulsion, PARAMS.mouseRepulsion);
+                gl.uniform1f(U.uTwinkleIntensity, PARAMS.twinkleIntensity);
+                gl.uniform1f(U.uRotationSpeed, PARAMS.rotationSpeed);
+                gl.uniform1f(U.uRepulsionStrength, PARAMS.repulsionStrength);
+                gl.uniform1f(U.uAutoCenterRepulsion, PARAMS.autoCenterRepulsion);
+                gl.uniform1f(U.uTransparent, PARAMS.transparent);
+            }
+            applyStaticUniforms();
+
+            function resize() {
+                // 性能优化：限制渲染像素总数，避免 4K/Retina 屏 shader 过载卡顿
+                // 上限约 92 万像素（1280×720 量级），CSS 拉伸到全屏，星空背景视觉无影响
+                const MAX_PIXELS = 1280 * 720;
+                const w = window.innerWidth;
+                const h = window.innerHeight;
+                const aspect = w / h;
+                let rw = w, rh = h;
+                if (rw * rh > MAX_PIXELS) {
+                    const scale = Math.sqrt(MAX_PIXELS / (rw * rh));
+                    rw = Math.floor(rw * scale);
+                    rh = Math.floor(rw / aspect);
+                }
+                canvas.width = rw;
+                canvas.height = rh;
+                canvas.style.width = w + 'px';
+                canvas.style.height = h + 'px';
+                gl.viewport(0, 0, rw, rh);
+                gl.uniform3f(U.uResolution, rw, rh, rw / rh);
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            // 鼠标交互（全局监听，canvas pointer-events: none）
+            let tmx = 0.5, tmy = 0.5;     // target
+            let mx = 0.5, my = 0.5;        // smoothed
+            let tmActive = 0.0;            // target active
+            let mActive = 0.0;             // smoothed
+
+            window.addEventListener('mousemove', (e) => {
+                tmx = e.clientX / window.innerWidth;
+                tmy = 1.0 - e.clientY / window.innerHeight;
+                tmActive = 1.0;
+            });
+            window.addEventListener('mouseleave', () => { tmActive = 0.0; });
+            document.addEventListener('mouseleave', () => { tmActive = 0.0; });
+
+            // 标签页隐藏时暂停 RAF，节省 CPU/GPU
+            let visible = true;
+            document.addEventListener('visibilitychange', () => {
+                const nowVisible = !document.hidden;
+                if (nowVisible && !visible) {
+                    visible = true;
+                    requestAnimationFrame(frame);
+                } else if (!nowVisible) {
+                    visible = false;
+                }
+            });
+
+            const start = performance.now();
+            function frame() {
+                if (!visible) return;
+                const t = (performance.now() - start) * 0.001;
+
+                // lerp 0.1（响应更快、移动更丝滑）
+                mx += (tmx - mx) * 0.1;
+                my += (tmy - my) * 0.1;
+                mActive += (tmActive - mActive) * 0.1;
+
+                gl.clear(gl.COLOR_BUFFER_BIT);
+                gl.uniform1f(U.uTime, t);
+                gl.uniform1f(U.uStarSpeed, (t * PARAMS.starSpeed) / 10.0);
+                gl.uniform2f(U.uMouse, mx, my);
+                gl.uniform1f(U.uMouseActiveFactor, mActive);
+                gl.drawArrays(gl.TRIANGLES, 0, 3);
+                requestAnimationFrame(frame);
+            }
+            requestAnimationFrame(frame);
+        })();
+
+        /* ================================================================
+           AccordionGallery · 我的荣誉手风琴交互
+           hover/click 切换 active + 键盘左右切换 + ResizeObserver 测量 media 尺寸
+           ================================================================ */
+        (function () {
+            const gallery = document.getElementById('honorsGallery');
+            if (!gallery) return;
+            const panels = Array.from(gallery.querySelectorAll('.ag-panel'));
+            const count = panels.length;
+            if (count === 0) return;
+
+            // 找到当前 active 索引
+            function getActive() {
+                const idx = panels.findIndex(p => p.classList.contains('ag-panel--active'));
+                return idx < 0 ? 0 : idx;
+            }
+
+            function setActive(next, fromKeyboard) {
+                if (next < 0 || next >= count) return;
+                const cur = getActive();
+                if (cur === next && fromKeyboard) return;
+                panels.forEach((p, i) => {
+                    const isActive = i === next;
+                    p.classList.toggle('ag-panel--active', isActive);
+                    // 左右倾斜类（基于相对位置）
+                    p.classList.toggle('ag-panel--left', i < next);
+                    p.classList.toggle('ag-panel--right', i > next);
+                    if (isActive) p.setAttribute('aria-current', 'true');
+                    else p.removeAttribute('aria-current');
+                });
+            }
+
+            // 初始化：基于当前 active（HTML 中标了 ag-panel--active 的第 4 张）设置左右类
+            (function initSides() {
+                const a = getActive();
+                panels.forEach((p, i) => {
+                    p.classList.toggle('ag-panel--left', i < a);
+                    p.classList.toggle('ag-panel--right', i > a);
+                });
+            })();
+
+            // hover / focus 切换（trigger='hover'）
+            panels.forEach((p, i) => {
+                p.addEventListener('mouseenter', () => setActive(i));
+                p.addEventListener('focus', () => setActive(i));
+                // 点击：若不是 active 就切换并阻止跳转
+                p.addEventListener('click', (e) => {
+                    if (!p.classList.contains('ag-panel--active')) {
+                        e.preventDefault();
+                        setActive(i);
+                    }
+                });
+                // 键盘左右切换
+                p.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        setActive((i + 1) % count, true);
+                        panels[(i + 1) % count].focus();
+                    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        setActive((i - 1 + count) % count, true);
+                        panels[(i - 1 + count) % count].focus();
+                    }
+                });
+            });
+
+            // ResizeObserver：测量容器宽度，更新 --ag-media-size
+            // 对齐 React 版 mediaSize = usable * expandRatio * 1.22
+            function measure() {
+                const rect = gallery.getBoundingClientRect();
+                const gap = 10;
+                const total = rect.width;
+                const usable = Math.max(total - gap * (count - 1), 120);
+                const size = Math.max(140, usable * 0.52 * 1.22);
+                gallery.style.setProperty('--ag-media-size', `${size}px`);
+            }
+            measure();
+            if (typeof ResizeObserver !== 'undefined') {
+                const ro = new ResizeObserver(measure);
+                ro.observe(gallery);
+            } else {
+                window.addEventListener('resize', measure);
+            }
+        })();
+
+        /* ================================================================
+           StrokeText · 首页描边文字初始化
+           - 等 webfont 加载完成，测量 SVG text 的 BBox
+           - 设置 svg viewBox + clipPath rect 的 x/y/height
+           - RAF 启动 wipe 动画（rect width 0 → box.width，power2.inOut 缓动）
+           ================================================================ */
+        (function () {
+            const INSTANCES = [
+                { rootId: 'strokeTitle', strokeClass: 'stroke-text__stroke', wipeId: 'wipeTitle',
+                  drawDuration: 1.6, fillDelay: 0.2, fillDuration: 0.8, stagger: 0.05 },
+                { rootId: 'strokeSub',   strokeClass: 'stroke-text__stroke', wipeId: 'wipeSub',
+                  drawDuration: 1.6, fillDelay: 0.2, fillDuration: 0.8, stagger: 0.05 }
+            ];
+
+            const prefersReduced =
+                typeof window.matchMedia === 'function' &&
+                window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            // power2.inOut 缓动
+            function easeInOut(t) {
+                return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+            }
+
+            function setup(inst) {
+                const root = document.getElementById(inst.rootId);
+                if (!root) return;
+                const svg = root.querySelector('svg');
+                const strokeText = root.querySelector('.' + inst.strokeClass + ' text') || root.querySelector('.' + inst.strokeClass);
+                const wipeRect = root.querySelector('#' + inst.wipeId + ' .wipe-rect');
+                if (!svg || !strokeText || !wipeRect) return;
+
+                const strokeChars = root.querySelectorAll('[data-stroke-char]');
+                const charCount = strokeChars.length;
+
+                function measure() {
+                    let bbox;
+                    try {
+                        bbox = strokeText.getBBox();
+                    } catch (e) { return; }
+                    if (!bbox || !bbox.width) return;
+
+                    const pad = Math.max(8, parseFloat(getComputedStyle(root).getPropertyValue('--stroke-text-height')) * 0.05 || 8);
+                    const x = bbox.x - pad;
+                    const y = bbox.y - pad;
+                    const width = bbox.width + pad * 2;
+                    const height = bbox.height + pad * 2;
+
+                    svg.setAttribute('viewBox', x + ' ' + y + ' ' + width + ' ' + height);
+                    wipeRect.setAttribute('x', x);
+                    wipeRect.setAttribute('y', y);
+                    wipeRect.setAttribute('height', height);
+
+                    if (prefersReduced) {
+                        wipeRect.setAttribute('width', width);
+                        return;
+                    }
+
+                    // 计算 wipe 启动时间：最后一字符描完之后 + fillDelay
+                    const lastCharDelay = (charCount - 1) * inst.stagger;
+                    const wipeStartMs = (inst.drawDuration + lastCharDelay + inst.fillDelay) * 1000;
+                    const wipeDurationMs = inst.fillDuration * 1000;
+                    const t0 = performance.now();
+
+                    let started = false;
+                    function tick(now) {
+                        const elapsed = now - t0;
+                        if (elapsed < wipeStartMs) {
+                            if (!started) wipeRect.setAttribute('width', 0);
+                            requestAnimationFrame(tick);
+                            return;
+                        }
+                        started = true;
+                        const t = Math.min((elapsed - wipeStartMs) / wipeDurationMs, 1);
+                        const eased = easeInOut(t);
+                        wipeRect.setAttribute('width', String(width * eased));
+                        if (t < 1) requestAnimationFrame(tick);
+                    }
+                    requestAnimationFrame(tick);
+                }
+
+                // 字体可能尚未加载完成，多次保险测量
+                if (document.fonts && document.fonts.ready) {
+                    document.fonts.ready.then(measure).catch(() => {});
+                }
+                requestAnimationFrame(measure);
+                setTimeout(measure, 200);
+                setTimeout(measure, 800);
+                window.addEventListener('load', measure);
+            }
+
+            INSTANCES.forEach(setup);
+        })();
+
+        /* ================================================================
+           Shuffle · 技能树字符滚动入场（复刻 React + GSAP SplitText 版）
+           - 递归遍历元素 childNodes：文本节点拆字符 wrap，元素节点（如 <strong>）递归
+           - 每字符包 .shuf-wrap(overflow hidden) + .shuf-char（初始 translateY(115%)）
+           - IntersectionObserver 进入视图时给父元素加 .is-shuffled，CSS 过渡滚入
+           - stagger 通过 --i 计算 transition-delay（0.022s 每字符）
+           - triggerOnce=true：触发一次后 unobserve
+           ================================================================ */
+        (function () {
+            const TARGETS = document.querySelectorAll(
+                '#skills .skill-card-title, #skills .skill-item-title, #skills .skill-item-desc'
+            );
+            if (!TARGETS.length) return;
+
+            // 递归拆字符：保留 <strong> 等元素节点结构，仅把文本节点拆成 .shuf-wrap
+            function shuffleSplit(root) {
+                let counter = 0;
+                function wrapTextNode(textNode) {
+                    const text = textNode.nodeValue;
+                    if (!text) return;
+                    const frag = document.createDocumentFragment();
+                    const chars = Array.from(text);
+                    chars.forEach(c => {
+                        // 空白字符保留原样（不拆 span，避免换行错位）
+                        if (/\s/.test(c)) {
+                            frag.appendChild(document.createTextNode(c));
+                            return;
+                        }
+                        const wrap = document.createElement('span');
+                        wrap.className = 'shuf-wrap';
+                        const inner = document.createElement('span');
+                        inner.className = 'shuf-char';
+                        inner.textContent = c;
+                        inner.style.setProperty('--i', String(counter++));
+                        wrap.appendChild(inner);
+                        frag.appendChild(wrap);
+                    });
+                    textNode.parentNode.replaceChild(frag, textNode);
+                }
+                function process(el) {
+                    // 用 Array.from 静态快照，避免递归替换时 live NodeList 错乱
+                    const kids = Array.from(el.childNodes);
+                    kids.forEach(node => {
+                        if (node.nodeType === Node.TEXT_NODE) {
+                            wrapTextNode(node);
+                        } else if (node.nodeType === Node.ELEMENT_NODE) {
+                            process(node);
+                        }
+                    });
+                }
+                process(root);
+            }
+
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-shuffled');
+                        io.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15, rootMargin: '-60px' });
+
+            // 等字体加载完成再拆字符（保证宽度测量准确、避免字形换装跳变）
+            function initAll() {
+                TARGETS.forEach(el => {
+                    shuffleSplit(el);
+                    io.observe(el);
+                });
+            }
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(initAll).catch(() => initAll());
+            } else {
+                initAll();
+            }
+        })();
+
+        /* ================================================================
+           PixelTrail · 鼠标轨迹像素网格点阵（复刻 React Three Fiber + drei 版）
+           - 全屏 Canvas2D，pointer-events: none
+           - 维护 trail 数组（鼠标轨迹点 + 时间戳，过期自动剔除）
+           - 每帧渲染全屏网格点：每点根据到 trail 最近点的距离决定 alpha+半径
+           - composite 'lighter' 让亮点重叠时发光，与 SVG goo filter 配合产生黏连
+           - 鼠标插值 lerp 0.4 让 trail 之间填充更平滑（替代 interpolate=5）
+           - 移动端禁用
+           ================================================================ */
+        (function () {
+            const isMobile = matchMedia('(max-width: 768px)').matches ||
+                matchMedia('(hover: none)').matches ||
+                'ontouchstart' in window;
+            const canvas = document.getElementById('pixelTrailCanvas');
+            if (!canvas || isMobile) return;
+
+            const ctx = canvas.getContext('2d', { alpha: true });
+            if (!ctx) return;
+
+            // 配置（对齐 React 默认参数）
+            const CFG = {
+                gridSize: 40,         // 网格大小（px）
+                trailSize: 90,       // 鼠标影响半径（px）
+                maxAge: 250,         // 轨迹存活时间（ms）
+                lerp: 0.4,           // 鼠标插值（值越小越跟手）
+                maxTrail: 80,        // trail 数组最大长度（避免无限增长）
+                baseDotR: 1.0,       // 基础点半径
+                maxDotR: 3.5,        // 最大点半径（鼠标贴上去时）
+                color: [255, 255, 255]
+            };
+
+            let dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+            function resize() {
+                const w = window.innerWidth;
+                const h = window.innerHeight;
+                canvas.width = Math.floor(w * dpr);
+                canvas.height = Math.floor(h * dpr);
+                canvas.style.width = w + 'px';
+                canvas.style.height = h + 'px';
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            const trail = [];
+            const cursor = { x: -1000, y: -1000 };
+            const mouse = { x: -1000, y: -1000 };
+            let lastPush = 0;
+
+            window.addEventListener('mousemove', (e) => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+            }, { passive: true });
+            window.addEventListener('mouseleave', () => {
+                mouse.x = -1000;
+                mouse.y = -1000;
+            });
+            window.addEventListener('blur', () => {
+                mouse.x = -1000;
+                mouse.y = -1000;
+            });
+
+            let visible = true;
+            document.addEventListener('visibilitychange', () => {
+                visible = !document.hidden;
+            });
+
+            function lerp(a, b, t) { return a + (b - a) * t; }
+
+            function tick() {
+                if (visible) {
+                    const now = performance.now();
+
+                    // 鼠标插值（让 trail 平滑跟随）
+                    cursor.x = lerp(cursor.x, mouse.x, CFG.lerp);
+                    cursor.y = lerp(cursor.y, mouse.y, CFG.lerp);
+
+                    // 推入 trail（节流：每 16ms 一个点，避免过密）
+                    if (now - lastPush > 12 && mouse.x > -100) {
+                        trail.push({ x: cursor.x, y: cursor.y, t: now });
+                        lastPush = now;
+                        if (trail.length > CFG.maxTrail) trail.shift();
+                    }
+
+                    // 剔除过期 trail
+                    while (trail.length && now - trail[0].t > CFG.maxAge) trail.shift();
+
+                    // 清空 canvas
+                    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+                    ctx.globalCompositeOperation = 'lighter';
+
+                    const w = window.innerWidth;
+                    const h = window.innerHeight;
+                    const G = CFG.gridSize;
+                    const R = CFG.trailSize;
+                    const cr = CFG.color;
+
+                    // 遍历网格点
+                    for (let x = G / 2; x < w; x += G) {
+                        for (let y = G / 2; y < h; y += G) {
+                            let minDist = Infinity;
+                            // 找最近 trail 点的距离
+                            for (let i = 0; i < trail.length; i++) {
+                                const p = trail[i];
+                                const dx = p.x - x;
+                                const dy = p.y - y;
+                                const d2 = dx * dx + dy * dy;
+                                if (d2 < minDist) minDist = d2;
+                            }
+                            if (minDist < R * R) {
+                                const d = Math.sqrt(minDist);
+                                // 距离越近 alpha 越高（线性衰减）
+                                const t = 1 - d / R;
+                                // 透明度也受 trail 年龄影响（最老的点 alpha 最低）
+                                const alpha = t * 0.9;
+                                const r = CFG.baseDotR + t * (CFG.maxDotR - CFG.baseDotR);
+                                ctx.fillStyle = 'rgba(' + cr[0] + ',' + cr[1] + ',' + cr[2] + ',' + alpha.toFixed(3) + ')';
+                                ctx.beginPath();
+                                ctx.arc(x, y, r, 0, Math.PI * 2);
+                                ctx.fill();
+                            }
+                        }
+                    }
+
+                    ctx.globalCompositeOperation = 'source-over';
+                }
+                requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
+        })();
+    </script>
+
+    <!-- ==================== PixelTrail 鼠标轨迹像素网格点阵 ==================== -->
+    <svg class="pixel-goo-svg" aria-hidden="true">
+        <defs>
+            <filter id="pixelGooFilter">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
+                <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+                <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+            </filter>
+        </defs>
+    </svg>
+    <canvas id="pixelTrailCanvas"></canvas>
+</body>
+</html>
