@@ -4194,7 +4194,7 @@
                 grayscale: false
             };
 
-            // ===== 数据：9 张证书 =====
+            // ===== 数据：11 张证书 =====
             const ITEMS = [
                 { image: 'certificate.png', title: '荣誉证书 1' },
                 { image: 'img_01a703fedf5da21e24b7c8ead64d398a.png', title: '荣誉证书 2' },
@@ -4204,7 +4204,9 @@
                 { image: 'img_d25feefa38393aa112c420f4a2c913cd.png', title: '荣誉证书 6' },
                 { image: 'img_e312379d154c01a6b6b797bdce59bb43.png', title: '荣誉证书 7' },
                 { image: 'cert-prompt-engineer.png', title: 'Prompt Engineer 认证' },
-                { image: 'cert-rag-engineer.png', title: 'RAG 工程师认证' }
+                { image: 'cert-rag-engineer.png', title: 'RAG 工程师认证' },
+                { image: 'cert-ai-intro.png', title: '人工智能初识微认证' },
+                { image: 'cert-huawei-ai-agent.png', title: '华为云 AI Agent 技能认证' }
             ];
 
             // 工具函数
@@ -4215,9 +4217,12 @@
                 return 1 + variance * pseudo;
             };
 
-            // 按列分配 items
             const cols = Array.from({ length: CFG.columns }, () => []);
-            ITEMS.forEach((item, i) => cols[i % CFG.columns].push(item));
+            // 按列分配 items：每张证书同时出现在两列（原列 + 向中列偏移），保证至少一次落在中间三列，避免只在两侧"看不到"
+            ITEMS.forEach((item, i) => {
+                cols[i % CFG.columns].push(item);
+                cols[(i + Math.floor(CFG.columns / 2)) % CFG.columns].push(item);
+            });
             const columnItems = cols.map(col => (col.length ? col : [ITEMS[0]]));
 
             let containerHeight = 600;
